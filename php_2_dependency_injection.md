@@ -16,7 +16,7 @@ class MyClass {
       /*
       ^
       | psychological line
-`     */
+      */
 
       // return type is visually in line with the indention of the dependencies
   ) : string { // space on both sides of the :
