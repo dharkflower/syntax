@@ -21,6 +21,13 @@ class MyClass {
       */
 
       // return type is visually in line with the indention of the dependencies
+
+      /*
+      ^
+      | psychological line
+      */
+
+      // lines up with return type "string"
   ) : string { // space on both sides of the :
     
   }
