@@ -12,10 +12,10 @@ class MyClass {
   private function goodExample ( // break to next line
 
       // indent like you would a Python script
-      private User $user,
-      private Session $session,
-      private EntityManager $entityManager,
-      private EntityRepository $entityRepository
+      User $user,
+      Session $session,
+      EntityManager $entityManager,
+      EntityRepository $entityRepository
 
       /*
       ^
