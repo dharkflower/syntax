@@ -72,7 +72,7 @@ This concept can also be applied to HTML:
       | psychological line
       */
       
-    ><!-- -->
+    ><!-- --> // visually end the tag a little bit more to the right with an empty comment
 
       /*
       ^
