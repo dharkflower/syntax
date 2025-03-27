@@ -125,7 +125,7 @@ This concept can also be applied to HTML:
         | psychological line
         */
 
-      >
+      ><!-- -->
 
       /*
       ^
