@@ -5,10 +5,6 @@ This is how dependency injection should look in a PHP Class. With a large number
 
 class MyClass {
 
-  public function __construct (
-  ) {
-  }
-
   private function goodExample ( // break to next line
 
       // indent like you would a Python script
