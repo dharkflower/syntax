@@ -93,8 +93,13 @@ This concept can also be applied to HTML:
 
       href=""
       id="navigation"
+      class="
+          bg-light
+          container-fluid
+          p-3
+      "
       data-index="0"
-      data-element="navigation
+      data-element="navigation"
 
       /*
       ^
