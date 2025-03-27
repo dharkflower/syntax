@@ -1,6 +1,6 @@
 This is how dependency injection should look in a PHP Class:
 
-```
+```php
 <?php
 
 class MyClass {
