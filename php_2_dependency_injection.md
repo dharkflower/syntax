@@ -1,6 +1,8 @@
 This is how dependency injection should look in a PHP Class:
 
 ```
+<?php
+
 class MyClass {
 
   public function __construct (
