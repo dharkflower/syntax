@@ -37,6 +37,7 @@ class MyClass {
       | psychological line
       */
 
+      // lines up with the left side of the return statement - "return"
       return 'ok';
 
   }
@@ -47,4 +48,64 @@ class MyClass {
   }
 
 }
+```
+
+This concept can also be applied to HTML:
+
+```html
+<html>
+
+  <head>
+  </head>
+
+  <body>
+
+    <a // break to next line
+
+      href=""
+      id="navigation"
+      data-index="0"
+      data-element="navigation
+
+      /*
+      ^
+      | psychological line
+      */
+      
+    ><!-- -->
+
+      /*
+      ^
+      | psychological line
+      */
+
+      <span
+
+        /*
+        ^
+        | psychological line
+        */
+
+        class="list-item"
+        data-index="1"
+        data-color="blue"
+
+        /*
+        ^
+        | psychological line
+        */
+
+      >
+
+      /*
+      ^
+      | psychological line
+      */
+
+      </span>
+    </a>
+
+  </body>
+
+</html>
 ```
