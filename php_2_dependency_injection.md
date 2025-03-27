@@ -77,6 +77,8 @@ class MyClass {
   
       );
 
+      return $post;
+
   }
 
 }
