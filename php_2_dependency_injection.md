@@ -47,6 +47,38 @@ class MyClass {
       return 'ok';
   }
 
+  private function otherExample (
+
+      User $user,
+      Post $post
+
+  ) : Post {
+
+    // bad
+    $uid = $user->getUid();
+    $post->setUid($uid);
+
+    // good
+    $post-> setUid ( // break to new line
+
+        // I vote to normalize breaking arguments to a new line, just like the __construct function
+        $user->getUid(),
+
+        /*
+        ^
+        | psychological line
+        */
+
+        TRUE,
+
+        FALSE,
+
+        3
+
+    );
+
+  }
+
 }
 ```
 
