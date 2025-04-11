@@ -49,3 +49,5 @@ guess 500 {
 ```
 
 As the script grows in complexity the ability for a PHP script to determine what priority to run the process at gets blurry; `$loop1` and `$loop2` are random numbers now. How computationally expensive it will be will be different every time this script is run. However, if you use `guess` to say "this will be roughly 5 computationally expensive" and "this will be roughly 500 computationally expensive" then the script might be able to better know how to handle each block.
+
+It starts getting into deeper level thread technology conversations, but the *main* goal of this suggestion is to level out the load of all currently running PHP scripts on any given server. It balances how the processor is being used!
