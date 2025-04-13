@@ -91,3 +91,47 @@ class HomeController extends Controller {
 ```
 
 It would essentially allow you to make tiny little micro-suggestions of where to run more granular parts of PHP, if you could figure out how to have a single request be able to access the same request headers and information from different threads.
+
+It could potentially be used as a property as well like this:
+
+```php
+<?php
+
+class HomeController extends Controller {
+
+  migrate 50;
+
+  public function __construct (
+
+    private ContentRepository $repository
+  
+  ) {}
+
+  #[Route('/', name: 'index')]
+  public function index (
+
+    Request $request,
+    User $user
+
+  ) {
+
+    // this all runs at 50...
+
+    $content = $this->repository->findAll();
+
+    $json = json_encode([
+      'statusCode' => 200
+    ]);
+
+    return $this->render('index', [
+      'json' => $json,
+      'content' => $content
+    ]);
+
+    //...
+
+  }
+}
+```
+
+It could potentially use UNIX sockets instead of TCP sockets as well. It would have to track where that process's state is in RAM but if it could pass that identifier from thread to thread it might work.
