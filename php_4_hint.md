@@ -11,7 +11,7 @@ process.nextTick(() => {
   app.listen(3000)
 })
 ```
-It's a little meta but basically `you import stuff and then do stuff with it later`. It could potentially be an approach that if taken at the start of the execution of a function with that function being the scope there could be some analysis to be had there. What if there was a new syntax improvement that would facilitate some low-level performance improvements via some hinting that does stuff like asynchronous calls that *start* doing stuff, by doing some hinting at the beginning of a method using a new token `hint` - like this?:
+It's a little meta but basically `you import stuff and then do stuff with it later`. It could potentially be a pattern of performance found in Node that could work in PHP. At the start of the execution of a function where you set the function as the scope you could **prepare** the function for what it's about to execute. What if there was a new syntax improvement that would facilitate this - some low-level performance improvements via some hinting that does stuff like asynchronous curl calls that *autostart* or something using a new token `hint` like this?:
 
 ```php
 <?php
@@ -23,7 +23,14 @@ class HomeController extends Controller {
   
   ) {}
 
-  public function index (Request $request) {
+  #[Route('/', name: 'index')]
+  public function index (
+
+    Request $request,
+    User $user
+
+  ) {
+
     hint {
 
       // some function calls
@@ -66,7 +73,7 @@ class HomeController extends Controller {
 
     curl_close($ch);
 
-    return $this->render('index');
+    return $this->render('index', $content);
   }
 }
 ```
@@ -83,7 +90,14 @@ class HomeController extends Controller {
   
   ) {}
 
-  public function index (Request $request) {
+  #[Route('/', name: 'index')]
+  public function index (
+
+    Request $request,
+    User $user
+
+  ) {
+
     hint {
 
       // first function call
