@@ -71,7 +71,7 @@ class HomeController extends Controller {
 }
 ```
 
-`hint` could take a more strict approach or a more flexible one, allowing multiple types of tokens like function calls, constants, and objects. At a lower level, at the start of a function call when it hits `hint`, it could have certain per-method performance improvements that are made possible by the ability to more effectively manage what's in memory. You could even have the `hint` block be required to have each declaration be in order, so that the declarations are accessed sequentially. Sort of like a `hint` array that is a forecast of what order each function is going to be executed in. Here's another example:
+Using `hint` could be a more strict approach or a more flexible one, allowing multiple types of tokens like function calls, constants, and objects. At a lower level, at the start of a function call when it hits `hint`, it could have certain per-method performance improvements that are made possible by the ability to more effectively manage what's in memory. You could even have the `hint` block be required to have each declaration be in order, so that the declarations are accessed sequentially. Sort of like a `hint` array that is a forecast of what order each function is going to be executed in. Here's another example:
 
 ```php
 <?php
