@@ -4,8 +4,6 @@ I had this PHP idea because of a lower level coding pattern I've used in Node.js
 // source some libs:
 import { createServer } from 'express'
 import React from 'react'
-// other libs
-// other lib
 
 // and then you do something sometimes asynchronous with them like this:
 process.nextTick(() => {
