@@ -30,7 +30,7 @@ class HomeController extends Controller {
 
       // some function calls
       curl_init,
-      curl_setopt_array,
+      curl_setopt,
       curl_exec,
       curl_close,
 
