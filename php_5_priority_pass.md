@@ -26,7 +26,7 @@ foreach ($i = 1; $i * $multiplier <= $max; $i++) {
     $port = 3000 + $i;
 
     // set the priority for this thread/port
-    pcntl_setpriority($i * $multiplier, $pid);
+    pcntl_setpriority($i * $multiplier, getmypid());
 
     while (TRUE) {
 
