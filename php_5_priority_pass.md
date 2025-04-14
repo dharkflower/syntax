@@ -149,4 +149,4 @@ class HomeController extends Controller {
 }
 ```
 
-It could potentially use UNIX sockets instead of TCP sockets. It would have to track where that process's state is in RAM but if it could pass some kind of identifier from thread to thread it might be able to work as an independent yet unified system.
+It could potentially use UNIX sockets instead of TCP sockets. It would have to track where that process's state is in memory but if it could pass some kind of identifier from thread to thread it might be able to work as an independent yet unified system.
