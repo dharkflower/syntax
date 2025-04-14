@@ -1,4 +1,4 @@
-This would need to be written in C, in php-src. Potentially an extension would work too. Pretend some of this is C code. This example has `pcntl` as a dependency.
+This would need to be written in C, in php-src. An extension would probably work too. Pretend some of this is C code. This example has `pcntl` as a dependency.
 
 Let's imagine some kind of simple web server like this. It's untested and it's not perfect but you'll see the point, it spawns a bunch of PHP threads using `pcntl` that all run on different ports at different process priorities:
 
@@ -26,7 +26,7 @@ foreach ($i = 1; $i * $multiplier <= $max; $i++) {
     $port = 3000 + $i;
 
     // set the priority for this thread/port
-    pcntl_setpriority($i * $multiplier);
+    pcntl_setpriority($i * $multiplier, $pid);
 
     while (TRUE) {
 
@@ -42,14 +42,15 @@ foreach ($i = 1; $i * $multiplier <= $max; $i++) {
 
 ```
 
-An example of what this does could be explained with a setup using Apache2 - some kind of reverse proxy that would divert requests to specific ports based on desired priority. It's a little strange. But does that make sense?
+An example of what this does could be explained with a setup using Apache2 - some kind of reverse proxy that would divert requests to specific ports based on desired priority. It's a little strange, but at its most basic form it's the start of a type of load balancer. Does that make sense?
 
-This could potentially be handled natively by PHP. What if there was a new syntax token called `migrate` that worked something like this?:
+If load balancing was handled natively by PHP like this, what if there was a new syntax token called `migrate` that worked something like this?:
 
 ```php
 <?php
 
 class HomeController extends Controller {
+
   public function __construct (
 
     private ContentRepository $repository
@@ -62,7 +63,7 @@ class HomeController extends Controller {
     Request $request,
     User $user
 
-  ) {
+  ) : Response {
 
     // migrate this thread to the thread listener running at priority 50
     migrate 50;
@@ -90,15 +91,16 @@ class HomeController extends Controller {
 }
 ```
 
-It would essentially allow you to make tiny little micro-suggestions of where to run more granular parts of PHP, if you could figure out how to have a single request be able to access the same request headers and information from different threads.
+It would essentially allow you to make tiny little micro-suggestions of where, or at what priority, to run more granular parts of PHP, if you could figure out how to have a single request be able to access the same request headers and information from different threads.
 
-It could potentially be used as a property as well like this:
+It could potentially be used as a property like this:
 
 ```php
 <?php
 
 class HomeController extends Controller {
 
+  // property sets priority of all routes
   migrate 50;
 
   public function __construct (
@@ -113,9 +115,9 @@ class HomeController extends Controller {
     Request $request,
     User $user
 
-  ) {
+  ) : Response {
 
-    // this all runs at 50...
+    // this runs on thread listener running at priority 50...
 
     $content = $this->repository->findAll();
 
@@ -128,10 +130,31 @@ class HomeController extends Controller {
       'content' => $content
     ]);
 
-    //...
+  }
+
+  #[Route('/', name: 'about')]
+  public function about (
+
+    Request $request,
+    User $user
+
+  ) : Response {
+
+    // this runs on thread listener running at priority 50...
+
+    $content = $this->repository->findAll();
+
+    $json = json_encode([
+      'statusCode' => 200
+    ]);
+
+    return $this->render('about', [
+      'json' => $json,
+      'content' => $content
+    ]);
 
   }
 }
 ```
 
-It could potentially use UNIX sockets instead of TCP sockets as well. It would have to track where that process's state is in RAM but if it could pass that identifier from thread to thread it might work.
+It could potentially use UNIX sockets instead of TCP sockets. It would have to track where that process's state is in RAM but if it could pass some kind of identifier from thread to thread it might work.
