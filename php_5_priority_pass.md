@@ -65,13 +65,13 @@ class HomeController extends Controller {
 
   ) : Response {
 
-    // migrate this thread to the thread listener running at priority 50
+    // migrate this thread to thread listener running at priority 50 on port 3005
     migrate 50;
 
     // this line runs at priority 50 on port 3005
     $content = $this->repository->findAll();
 
-    // migrate this thread to the thread listener running at priority 10
+    // migrate this thread to thread listener running at priority 10 on port 3001
     migrate 10;
 
     // this line runs at priority 10 on port 3001
@@ -79,7 +79,7 @@ class HomeController extends Controller {
       'statusCode' => 200
     ]);
 
-    // migrate this thread to the thread listener running at default priority
+    // migrate this thread to the thread listener running at default priority on port 3000
     migrate default;
 
     // this line runs at the default priority on port 3000
@@ -117,17 +117,14 @@ class HomeController extends Controller {
 
   ) : Response {
 
-    // this runs on thread listener running at priority 50...
-
-    $content = $this->repository->findAll();
+    // this runs on thread listener running at priority 50 on port 3005
 
     $json = json_encode([
       'statusCode' => 200
     ]);
 
     return $this->render('index', [
-      'json' => $json,
-      'content' => $content
+      'json' => $json
     ]);
 
   }
@@ -140,16 +137,11 @@ class HomeController extends Controller {
 
   ) : Response {
 
-    // this runs on thread listener running at priority 50...
+    // this runs on thread listener running at priority 50 on port 3005
 
     $content = $this->repository->findAll();
 
-    $json = json_encode([
-      'statusCode' => 200
-    ]);
-
     return $this->render('about', [
-      'json' => $json,
       'content' => $content
     ]);
 
@@ -157,4 +149,4 @@ class HomeController extends Controller {
 }
 ```
 
-It could potentially use UNIX sockets instead of TCP sockets. It would have to track where that process's state is in RAM but if it could pass some kind of identifier from thread to thread it might work.
+It could potentially use UNIX sockets instead of TCP sockets. It would have to track where that process's state is in RAM but if it could pass some kind of identifier from thread to thread it might be able to work as an independent yet unified system.
