@@ -17,6 +17,7 @@ It's a little meta but basically `you import stuff and then do stuff with it lat
 <?php
 
 class HomeController extends Controller {
+
   public function __construct (
 
     private ContentRepository $repository
@@ -84,6 +85,7 @@ Using `hint` could be a more strict approach or a more flexible one, allowing mu
 <?php
 
 class HomeController extends Controller {
+
   public function __construct (
 
     private ContentRepository $repository
