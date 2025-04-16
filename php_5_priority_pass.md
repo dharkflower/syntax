@@ -129,7 +129,7 @@ class HomeController extends Controller {
 
   }
 
-  #[Route('/', name: 'about')]
+  #[Route('/about', name: 'about')]
   public function about (
 
     Request $request,
