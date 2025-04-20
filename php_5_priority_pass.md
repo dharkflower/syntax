@@ -30,7 +30,7 @@ foreach ($i = 1; $i * $multiplier <= $max; $i++) {
 
     while (TRUE) {
 
-      listen($port, function(Request $request) {
+      listen($port, function() {
 
         require_once 'autoload.php';
 
