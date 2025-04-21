@@ -10,34 +10,34 @@ $max = 100;
 
 foreach ($i = 1; $i * $multiplier <= $max; $i++) {
 
-  $pid = pcntl_fork();
+    $pid = pcntl_fork();
 
-  if ($pid == -1) {
-  
-    die('could not fork');
-  
-  } else if ($pid) { // we are the parent thread
+    if ($pid == -1) {
+    
+        die('could not fork');
+    
+    } else if ($pid) { // we are the parent thread
 
-    pcntl_wait($status);
+        pcntl_wait($status);
 
-  } else { // we are a child thread
+    } else { // we are a child thread
 
-    // set the port
-    $port = 3000 + $i;
+        // set the port
+        $port = 3000 + $i;
 
-    // set the priority for this thread/port
-    pcntl_setpriority($i * $multiplier, getmypid());
+        // set the priority for this thread/port
+        pcntl_setpriority($i * $multiplier, getmypid());
 
-    while (TRUE) {
+        while (TRUE) {
 
-      listen($port, function() {
+            listen($port, function() {
 
-        require_once 'autoload.php';
+                require_once 'autoload.php';
 
-      });
+            });
 
+        }
     }
-  }
 }
 
 ```
@@ -51,43 +51,43 @@ If load balancing was handled natively by PHP like this, what if there was a new
 
 class HomeController extends Controller {
 
-  public function __construct (
+    public function __construct (
 
-    private ContentRepository $repository
-  
-  ) {}
+        private ContentRepository $repository
 
-  #[Route('/', name: 'index')]
-  public function index (
+    ) {}
 
-    Request $request,
-    User $user
+    #[Route('/', name: 'index')]
+    public function index (
 
-  ) : Response {
+        Request $request,
+        User $user
 
-    // migrate this thread to thread listener running at priority 50 on port 3005
-    migrate 50;
+    ) : Response {
 
-    // this line runs at priority 50 on port 3005
-    $content = $this->repository->findAll();
+        // migrate this thread to thread listener running at priority 50 on port 3005
+        migrate 50;
 
-    // migrate this thread to thread listener running at priority 10 on port 3001
-    migrate 10;
+        // this line runs at priority 50 on port 3005
+        $content = $this->repository->findAll();
 
-    // this line runs at priority 10 on port 3001
-    $json = json_encode([
-      'statusCode' => 200
-    ]);
+        // migrate this thread to thread listener running at priority 10 on port 3001
+        migrate 10;
 
-    // migrate this thread to the thread listener running at default priority on port 3000
-    migrate default;
+        // this line runs at priority 10 on port 3001
+        $json = json_encode([
+            'statusCode' => 200
+        ]);
 
-    // this line runs at the default priority on port 3000
-    return $this->render('index', [
-      'json' => $json,
-      'content' => $content
-    ]);
-  }
+        // migrate this thread to the thread listener running at default priority on port 3000
+        migrate default;
+
+        // this line runs at the default priority on port 3000
+        return $this->render('index', [
+            'json' => $json,
+            'content' => $content
+        ]);
+    }
 }
 ```
 
@@ -100,52 +100,52 @@ It could potentially be used as a property like this:
 
 class HomeController extends Controller {
 
-  // property sets priority of all routes
-  migrate 50;
+    // property sets priority of all routes
+    migrate 50;
 
-  public function __construct (
+    public function __construct (
 
-    private ContentRepository $repository
-  
-  ) {}
+        private ContentRepository $repository
 
-  #[Route('/', name: 'index')]
-  public function index (
+    ) {}
 
-    Request $request,
-    User $user
+    #[Route('/', name: 'index')]
+    public function index (
 
-  ) : Response {
+        Request $request,
+        User $user
 
-    // this runs on thread listener running at priority 50 on port 3005
+    ) : Response {
 
-    $json = json_encode([
-      'statusCode' => 200
-    ]);
+        // this runs on thread listener running at priority 50 on port 3005
 
-    return $this->render('index', [
-      'json' => $json
-    ]);
+        $json = json_encode([
+            'statusCode' => 200
+        ]);
 
-  }
+        return $this->render('index', [
+            'json' => $json
+        ]);
 
-  #[Route('/about', name: 'about')]
-  public function about (
+    }
 
-    Request $request,
-    User $user
+    #[Route('/about', name: 'about')]
+    public function about (
 
-  ) : Response {
+        Request $request,
+        User $user
 
-    // this runs on thread listener running at priority 50 on port 3005
+    ) : Response {
 
-    $content = $this->repository->findAll();
+        // this runs on thread listener running at priority 50 on port 3005
 
-    return $this->render('about', [
-      'content' => $content
-    ]);
+        $content = $this->repository->findAll();
 
-  }
+        return $this->render('about', [
+            'content' => $content
+        ]);
+
+    }
 }
 ```
 
