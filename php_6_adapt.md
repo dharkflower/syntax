@@ -51,7 +51,7 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
 
     ) : Response {
 
-        // new `adapt`token, takes a ceiling parameter so it knows the max number of $iterations
+        // new `adapt` token, takes a ceiling parameter so it knows the max number of $iterations
         $iterations = adapt 100;
 
         // but when called like this after setting $iterations to an `adapt`variable...
@@ -70,18 +70,18 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
     }
 ```
 ### what's the point?
-it's potentially an AI concept that lives deep in an ideology that for every "forgivable, bendable, stretchable" variable that determines iterations there is an opportunity to make decisions on not just what and when to think but when *not to* and to give up on a rabbit hole type of thread.
+it's potentially an AI concept that lives deep in an ideology that for every "forgivable, bendable, stretchable" variable that determines iterations there is an opportunity to make decisions on not just what and when to think but when *not to* and to give up on a dead end rabbit hole type of thread.
 
 when you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up
 ```php
 <?php
 
 for ($i = 0; $i < adapt $iterations; $i++) {
-    // PC load 6? 75 times
+    // 75 times
 }
 
-adapt for ($i = 0; $i < $iterations; $i++) {
-    // PC load 6? 75 times
+adapt $i for ($i = 0; $i < $iterations; $i++) {
+    // 75 times
 }
 
 adapt $i default {
