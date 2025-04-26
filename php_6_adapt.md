@@ -70,7 +70,7 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
     }
 ```
 ### what's the point?
-it's potentially an AI concept that lives deep in an ideology that for every "forgivable, bendable, stretchable" variable that determines iterations there is an opportunity to make decisions on not just what and when to think but when *not to* and to give up on a dead end rabbit hole type of thread.
+it's potentially an AI concept that lives deep in an ideology that for every "forgivable, bendable, stretchable" variable that determines iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
 
 when you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up
 ```php
