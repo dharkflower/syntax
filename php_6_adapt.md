@@ -1,4 +1,4 @@
-I don't think this is a threat to more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
+8I don't think this is a threat to more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
 
 ```php
 <?php
@@ -55,7 +55,7 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
         $iterations = adapt 100;
 
         // but when called like this after setting $iterations to an `adapt` variable...
-        adapt $iterations;
+        adapt $iterations 3 / 4;
 
         // now, $iterations is 75
         // because PC load is let's say 6
@@ -93,11 +93,11 @@ It's almost like a switch case or a CSS3 keyframes transition. It could end up b
 <?php
 
 adapt ($iterations) {
-    load 75:
-        // runs 75 times
+    load < 6:
+        // run 100 times
         break;
     default:
-        // runs 100 times
+        // runs 75 times
         break;
 }
 ```
