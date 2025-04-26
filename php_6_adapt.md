@@ -17,6 +17,7 @@ class HomeController {
         $iterations = 0;
 
         // get some sort of number that represents PC load
+        // you'd have to run a shell command like top or something
         $pcload = getpcload();
         $pcload = 4; // hardcode this for now
         
