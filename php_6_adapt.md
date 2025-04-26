@@ -1,4 +1,4 @@
-This is some neural net type of code, I don't know what to do with it. It's not a threat to a more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
+I don't think this is a threat to more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
 
 ```php
 <?php
@@ -92,7 +92,7 @@ adapt $i = 3 / 4 {
     // 75 times
 }
 ```
-It's almost like a switch case. It could end up being something like this:
+It's almost like a switch case or a CSS3 keyframes transition. It could end up being something like this:
 ```php
 <?php
 
