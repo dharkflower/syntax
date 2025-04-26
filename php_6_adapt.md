@@ -54,7 +54,7 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
         // new `adapt`token, takes a ceiling parameter so it knows the max number of $iterations
         $iterations = adapt 100;
 
-        // but when used like this after setting $iterations to an `adapt`variable...
+        // but when called like this after setting $iterations to an `adapt`variable...
         adapt $iterations;
 
         // now, $iterations is 75
