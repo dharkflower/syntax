@@ -80,10 +80,6 @@ for ($i = 0; $i < adapt $iterations; $i++) {
     // 75 times
 }
 
-adapt $i for ($i = 0; $i < $iterations; $i++) {
-    // 75 times
-}
-
 adapt $i default {
     // 100 times
 }
@@ -96,7 +92,7 @@ It's almost like a switch case or a CSS3 keyframes transition. It could end up b
 ```php
 <?php
 
-adapt ($i) {
+adapt ($iterations) {
     load 75:
         // runs 75 times
         break;
