@@ -50,7 +50,7 @@ class MyClass {
       $post->setUid($uid, TRUE, FALSE, 3);
   
       // good
-      $post ->setUid ( // break to new line
+      $post->setUid( // break to new line
   
           // I vote to normalize breaking arguments to a new line, just like the __construct function
           $user->getUid(),
