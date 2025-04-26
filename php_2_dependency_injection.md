@@ -60,9 +60,9 @@ class MyClass {
           | psychological line
           */
   
-          TRUE,
+          TRUE, // allows for per-argument comments like this one
   
-          FALSE,
+          FALSE, // and this one
   
           3
   
