@@ -45,7 +45,7 @@ class HomeController extends Controller {
             CURLOPT_HEADER,
             CURLOPT_RETURNTRANSFER,
             CURLOPT_POST,
-            CURLOPT_POSTFIELDS
+            CURLOPT_POSTFIELDS,
 
             // some properties
             $this->repository
