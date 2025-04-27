@@ -1,4 +1,4 @@
-I don't think this is a threat to a more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some more under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
+I don't think this is a threat to a more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements if harnessed correctly and some simplifications for people coding math-heavy applications like load balancers in PHP.
 
 ```php
 <?php
