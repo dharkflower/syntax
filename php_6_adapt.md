@@ -1,4 +1,4 @@
-8I don't think this is a threat to more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
+I don't think this is a threat to a more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some more under-the-hood speed improvements and some simplifications for people using math-based load balancing in PHP.
 
 ```php
 <?php
@@ -13,15 +13,14 @@ class HomeController {
 
     ) : Response {
 
-        // okay, so how you *could* currently do pc load calculation is like this:
+        // okay, so how you *could* currently do load calculation is like this:
         $iterations = 0;
 
-        // get some sort of number that represents PC load
         // you'd have to run a shell command like top or something
-        $pcload = getpcload();
-        $pcload = 4; // hardcode this for now
+        $load = getload();
+        $load = 4; // hardcode this for now
         
-        if ($pcload < 5) {
+        if ($load < 5) {
             $iterations = 100;
         }
 
@@ -40,7 +39,7 @@ class HomeController {
 }
 
 ```
-That's cool and everything - adapting PHP code to PC load, but what if we abstracted some of it with some new tokens to inform some type of new under-the-hood load balancing stuff written in C. I imagine it working like this:
+That's cool and everything - adapting PHP code to load, but what if we abstracted some of it with some new tokens to inform some type of new under-the-hood load balancing stuff about what's important to run and what's not? I imagine it working like this:
 ```php
 <?php
 
@@ -58,7 +57,7 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
         // but when called like this after setting $iterations to an `adapt` variable...
         adapt $iterations 3 / 4;
 
-        // now, $iterations is 75
+        // now, $iterations is 75 if the load is high
         for ($i = 0; $i < $iterations; $i++) {
 
             // this block runs 75 times
@@ -69,15 +68,15 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
     }
 ```
 ### what's the point?
-it's potentially an AI concept that lives deep in an ideology that for every "forgivable, bendable, stretchable" variable that determines iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
+It's potentially an AI concept that for every "forgivable, bendable, stretchable" variable that determines things like iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
 
-when you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up
+When you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up:
 ```php
 <?php
 
 $iterations = adapt 100;
-for ($i = 0; $i < adapt $iterations; $i++) {
-    // 100 times or 75 times
+for ($i = 0; $i < adapt $iterations 3 / 4; $i++) {
+    // 100 times or 75 times, depending on load
 }
 
 $iterations = adapt 100;
