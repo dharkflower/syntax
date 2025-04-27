@@ -1,5 +1,5 @@
 ### adapt
-I don't think this is a threat to a more standard architecture like Symfony Messenger kind of stuff, I think it might even compliment it. It's just some code golf that could have some under-the-hood speed improvements if harnessed correctly and some simplifications for people coding dynamic math-heavy applications - like a load balancer, for example.
+I don't think this is a threat to a more standard architecture like something built on Symfony Messenger; I think it might even compliment it. It's just some code golf that could have some under-the-hood speed improvements if harnessed correctly and provide some simplifications for people coding dynamic math-heavy applications - like a load balancer, for example. Here's a simple example without `adapt`:
 
 ```php
 <?php
@@ -14,12 +14,8 @@ class HomeController {
 
     ) : Response {
 
-        // okay, so how you *could* currently do load calculation is like this:
-        $iterations = 0;
-
-        // you'd have to run a shell command like top or something
+        // hardcode to 4
         $load = getload();
-        $load = 4; // hardcode this for now
         
         if ($load < 5) {
             $iterations = 100;
@@ -29,9 +25,8 @@ class HomeController {
             $iterations = 75;
         }
 
+        // runs 100 times
         for ($i = 0; $i < $iterations; $i++) {
-
-            // this block runs either 100 times if the computer is pretty freed up or else 75 times if it's not
 
         }
 
@@ -40,7 +35,7 @@ class HomeController {
 }
 
 ```
-What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of dynamic type? It could select a value from a set of numbers based on criteria like load. I imagine it working something like this:
+What if we abstracted out some of the mathematical type code we write with a new type/token called `adapt` that is meant to dynamically accomplish the same thing as above? It could select a value from a set of numbers based on criteria like load. I imagine it working something like this - at least, without defining the criteria as load:
 ```php
 <?php
 
@@ -55,7 +50,7 @@ What if we abstracted some of the mathematical type code we write with a new typ
         // new `adapt` type
         $iterations = (adapt) 100 75 50 25;
 
-        // now, $iterations is 75 if the load is high
+        // runs either 100, 75, 50, or 25 times
         for ($i = 0; $i < $iterations; $i++) {
 
         }
@@ -64,7 +59,7 @@ What if we abstracted some of the mathematical type code we write with a new typ
     }
 ```
 ### What's the point?
-It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines things like compute-intensive iterations there is an opportunity to make decisions on not just what to think but when *not to* and throw in the towel in the name of performance. It makes way for other computations. It's logical deductive reasoning, if you think about it; killing off zombie threads is a form of thinking backwards.
+It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines something like number of compute-intensive iterations there is an opportunity to make decisions on not just what to think but when *not to* and throw in the towel in the name of performance. It makes way for other computations by arming the threads with logical deductive reasoning that knows when to stop itself, if you think about it; killing off zombie threads is a form of thinking backwards.
 
 It's almost like a switch case or a CSS3 keyframes transition. It could end up being something like this:
 ```php
@@ -82,6 +77,6 @@ adapt ($iterations) {
 
 }
 ```
-The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things - like load.
+The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things, too.
 
-I think there is a syntax to be had that allows a sort of definition of what criteria determines selection.
+I think there is a syntax to be had that allows a sort of definition of what criteria determines selection but I haven't flushed it out yet.
