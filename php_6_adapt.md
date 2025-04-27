@@ -39,7 +39,7 @@ class HomeController {
 }
 
 ```
-What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of reactive variable? I imagine it working something like this:
+What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of reactive type? I imagine it working something like this:
 ```php
 <?php
 
