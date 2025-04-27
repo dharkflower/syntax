@@ -77,6 +77,6 @@ adapt ($iterations) {
 
 }
 ```
-The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things, too.
+The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things - generally.
 
 I think there is a syntax to be had that allows a sort of definition of what criteria determines selection but I haven't flushed it out yet.
