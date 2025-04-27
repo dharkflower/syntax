@@ -1,3 +1,4 @@
+### adapt
 I don't think this is a threat to a more standard architecture like Symfony Messenger kind of stuff, I think it might even compliment it. It's just some code golf that could have some under-the-hood speed improvements if harnessed correctly and some simplifications for people coding dynamic math-heavy applications - like a load balancer, for example.
 
 ```php
