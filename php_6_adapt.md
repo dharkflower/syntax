@@ -59,8 +59,6 @@ That's cool and everything - adapting PHP code to PC load, but what if we abstra
         adapt $iterations 3 / 4;
 
         // now, $iterations is 75
-        // because PC load is let's say 6
-
         for ($i = 0; $i < $iterations; $i++) {
 
             // this block runs 75 times
@@ -77,15 +75,17 @@ when you start to think of it as a sort of limiter type thing, you can start to 
 ```php
 <?php
 
+$iterations = adapt 100;
 for ($i = 0; $i < adapt $iterations; $i++) {
-    // 75 times
+    // 100 times or 75 times
 }
 
-adapt $i default {
+$iterations = adapt 100;
+adapt $iterations default {
     // 100 times
 }
 
-adapt $i = 3 / 4 {
+adapt $iterations 3 / 4 {
     // 75 times
 }
 ```
