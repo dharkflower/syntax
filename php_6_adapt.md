@@ -68,7 +68,7 @@ That's cool and everything - adapting PHP code to load, but what if we abstracte
     }
 ```
 ### what's the point?
-It's potentially an AI concept that for every "forgivable, bendable, stretchable" variable that determines things like iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
+It's potentially an AI concept that for every "forgivable, bendable, stretchable" variable that determines things like iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. It's deductive reasoning. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
 
 When you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up:
 ```php
