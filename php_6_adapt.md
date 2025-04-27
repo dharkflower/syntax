@@ -59,7 +59,7 @@ What if we abstracted out some of the mathematical type code we write with a new
     }
 ```
 ### What's the point?
-It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines something like number of compute-intensive iterations there is an opportunity to make decisions on not just what to think but when *not to* and throw in the towel in the name of performance. It makes way for other computations by arming the threads with logical deductive reasoning that knows when to stop itself, if you think about it; killing off zombie threads is a form of thinking backwards.
+It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines something like number of compute-intensive iterations there is an opportunity to make micro-decisions on not just what to think but when *not to* and throw in the towel - in the name of performance. It makes way for other computations by arming each thread with logical deductive reasoning that smoothly knows when to limit itself, if you think about it; killing off zombie threads is a form of thinking backwards.
 
 It's almost like a switch case or a CSS3 keyframes transition. It could end up being something like this:
 ```php
