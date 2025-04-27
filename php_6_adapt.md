@@ -40,7 +40,7 @@ class HomeController {
 }
 
 ```
-What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of dynamic type? It could select a value from a set of numbers based on load. I imagine it working something like this:
+What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of dynamic type? It could select a value from a set of numbers based on criteria like load. I imagine it working something like this:
 ```php
 <?php
 
@@ -82,6 +82,6 @@ adapt ($iterations) {
 
 }
 ```
-The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could provide a pretty smooth API to mathematically react to things based on other things - like load.
+The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things - like load.
 
 I think there is a syntax to be had that allows a sort of definition of what criteria determines selection.
