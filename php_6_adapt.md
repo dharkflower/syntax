@@ -1,4 +1,4 @@
-I don't think this is a threat to a more standard architecture for responding to load like Symfony Messenger async processing could, it's just some code saving that could have some under-the-hood speed improvements if harnessed correctly and some simplifications for people coding math-heavy applications like load balancers in PHP.
+I don't think this is a threat to a more standard architecture like Symfony Messenger kind of stuff, I think it might even compliment it. It's just some code golf that could have some under-the-hood speed improvements if harnessed correctly and some simplifications for people coding math-heavy and reactive applications - like a load balancer, for example.
 
 ```php
 <?php
@@ -39,7 +39,7 @@ class HomeController {
 }
 
 ```
-That's cool and everything - adapting PHP code to load, but what if we abstracted some of it with some new tokens to inform some type of new under-the-hood load balancing stuff about what's important to run and what's not? I imagine it working like this:
+What if we abstracted some of the mathematical type code we write with a new type/token called `adapt` that is meant to be a sort of reactive variable? I imagine it working something like this:
 ```php
 <?php
 
@@ -51,54 +51,31 @@ That's cool and everything - adapting PHP code to load, but what if we abstracte
 
     ) : Response {
 
-        // new `adapt` token, takes a ceiling parameter so it knows the max number of $iterations
-        $iterations = adapt 100;
-
-        // but when called like this after setting $iterations to an `adapt` variable...
-        adapt $iterations 3 / 4;
+        // new `adapt` type
+        $iterations = (adapt) 100 75 50 25;
 
         // now, $iterations is 75 if the load is high
         for ($i = 0; $i < $iterations; $i++) {
-
-            // this block runs 75 times
 
         }
 
         return $this->render('index');
     }
 ```
-### what's the point?
-It's potentially an AI concept that for every "forgivable, bendable, stretchable" variable that determines things like iterations there is an opportunity to make decisions on not just what and when to think but when *not to* in the name of performance. It's deductive reasoning. The quicker you kill zombie threads the quicker you can spin up other asynchronous stuff.
+### What's the point?
+It's potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines things like compute-intensive iterations there is an opportunity to make decisions on not just what to think but when *not to* and throw in the towel in the name of performance. It's logical deductive reasoning, if you think about it - instead of trying to summon AI from the ground. The quicker you kill zombie threads the quicker you can spin up those types of asynchronous processes that just *think*.
 
-When you start to think of it as a sort of limiter type thing, you can start to actually come up with some pretty weird `adapt` type stuff that simplifies it up:
-```php
-<?php
-
-$iterations = adapt 100;
-for ($i = 0; $i < adapt $iterations 3 / 4; $i++) {
-    // 100 times or 75 times, depending on load
-}
-
-$iterations = adapt 100;
-adapt $iterations default {
-    // 100 times
-}
-
-adapt $iterations 3 / 4 {
-    // 75 times
-}
-```
 It's almost like a switch case or a CSS3 keyframes transition. It could end up being something like this:
 ```php
 <?php
 
 adapt ($iterations) {
-    load < 6:
-        // run 100 times
+    load > 4:
+        // run 75 times
         break;
     default:
-        // runs 75 times
+        // runs 100 times
         break;
 }
 ```
-The coolest thing about this is that `adapt` doesn't only have to determine iterations; that's just an example of adapting an important variable. But adapt could provide a pretty smooth API to mathematically react to things based on things that you sometimes can't predict like "number of requests coming through" or how everything on the server is running and being coordinated.
+The coolest thing about this is that `adapt` doesn't only have to determine iterations; that's just an example of adapting an important iteration variable. But `adapt` could provide a pretty smooth API to mathematically react to things based on things that you sometimes can't predict like "number of requests coming through" or how everything on the server is running and being coordinated.
