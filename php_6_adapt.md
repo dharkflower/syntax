@@ -101,3 +101,4 @@ adapt ($iterations) {
         break;
 }
 ```
+The coolest thing about this is that `adapt` doesn't only have to determine iterations; that's just an example of adapting an important variable. But adapt could provide a pretty smooth API to mathematically react to things based on things that you sometimes can't predict like "number of requests coming through" or how everything on the server is running and being coordinated.
