@@ -1,4 +1,4 @@
-Let's say that the trail code looked like this:
+Let's say a web request comes in and here's the trail:
 
 - index.php
 - $kernel = new Kernel()
@@ -17,9 +17,9 @@ Let's break it down, as an example, and say that a request to /user traces like 
 - echo
 - trim
 
-I don't know how to explain what I think is possible here yet - not fully. It involves reflections at the PHP and C level. But couldn't PHP source code be programatically sequenced out to produce a Frankenstein'd version of PHP source code? It would only contain the necessary C code for the PHP functions that are used for that individual request. You could then compile the sequenced C code and cache the resulting micro-binary.
+**Key Point**: if we already know what sequence the C functions will run in for a specific route that we code out, can't we programatically create a Frankenstein C sequence of the PHP source functions beforehand, and then compile it?
 
-Key point: if we already know what sequence the C functions will run in, for a specific request that we code out, can't we programatically create a C sequence beforehand and then compile it?
+This involves reflections at the PHP and C level. It would only contain the necessary C code for the PHP functions that are used for that individual route. You could then compile the sequenced C code and cache the resulting micro-binary.
 
 I know that entails alot of other stuff.
 
