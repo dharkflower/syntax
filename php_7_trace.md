@@ -23,7 +23,7 @@ This involves reflections at the PHP and C level. It would only contain the nece
 
 I know that entails alot of other stuff.
 
-You could run a build function that kicks out micro-binaries for all of the routes in advance, and then route to them programatically instead of hoisting up the *entire* PHP binary at execution time. It almost seems like an Apache2 plugin could be utilized here somehow.
+You could run a build function that kicks out micro-binaries for all of the routes in advance, and then route to them programatically instead of hoisting up the *entire* PHP binary at execution time. It almost seems like an Apache2 plugin could be written here, in C, that does this in the background.
 
 ### Syntax
 I think that there are some potential decorator/docblock type things that would allow for the informing of this hypothetical build process of helpful things via the usage of new syntax. I'm going to circle back to this, but just to get the wheels turning for now I'd check out [hint](https://github.com/dharkflower/syntax/blob/main/php_4_hint.md)
