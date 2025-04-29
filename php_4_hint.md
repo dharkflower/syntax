@@ -1,17 +1,17 @@
-I had this PHP idea because of a lower level coding pattern I've used in Node.js applications and scripts that looks something like this:
+###Asynchronous Pattern
 
 ```javascript
 // source some libs:
 import { createServer } from 'express'
 import React from 'react'
 
-// and then you do something sometimes asynchronous with them like this:
+// do something asynchronous:
 process.nextTick(() => {
     const app = createServer(() => {})
     app.listen(3000)
 })
 ```
-It's a little meta but basically `you import stuff and then do stuff with it later`. It could potentially be a pattern of performance found in Node that could work in PHP. At the start of the execution of a function where you set the function as the scope you could **prepare** the function for what it's about to execute. What if there was a new syntax improvement that would facilitate this - some low-level performance improvements via some hinting that does stuff like asynchronous curl calls that *autostart* or something using a new token `hint` like this?:
+That pattern inspired this syntax idea. Basically at the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. By defining asynchronous elements in advance it might simplify under-the-hood threading. What if there was a new token that would facilitate some low-level performance improvements via some hinting that does stuff like asynchronous curl calls that *autostart* or something using a new token `thread` like this?:
 
 ```php
 <?php
@@ -32,7 +32,7 @@ class HomeController extends Controller {
 
     ) : Response {
 
-        hint {
+        thread {
 
             // some function calls
             curl_init,
@@ -79,7 +79,7 @@ class HomeController extends Controller {
 }
 ```
 
-Using `hint` could be a more strict approach or a more flexible one, allowing multiple types of tokens like function calls, constants, and objects. At a lower level, at the start of a function call when it hits `hint`, it could have certain per-method performance improvements that are made possible by the ability to more effectively manage what's in memory. You could even have the `hint` block be required to have each declaration be in order, so that the declarations are accessed sequentially. Sort of like a `hint` array that is a forecast of what order each function is going to be executed in. Here's another example:
+Using `thread` could stick to a more strict approach or a more flexible one, allowing multiple types of tokens like function calls, constants, and objects. At a lower level, at the start of a function call when it hits `thread`, it could have certain per-method performance improvements that are made possible by the ability to more effectively manage what's happening. You could even have the `thread` block be required to have each declaration be in order, so that the declarations are accessed sequentially. Sort of like a `thread` array that is a forecast of what order each function is going to be executed in. Here's another example:
 
 ```php
 <?php
@@ -100,7 +100,7 @@ class HomeController extends Controller {
 
     ) : Response {
 
-        hint {
+        thread {
 
             // first function call
             str_replace,
@@ -113,11 +113,11 @@ class HomeController extends Controller {
 
         }
 
-        $header = str_replace('', '', $request->header1); // first function call
-        $number = rand(1, 10); // second function call
+        $header = str_replace('', '', $request->header1);
+        $number = rand(1, 10);
         $json = json_encode([
             'statusCode' => 200
-        ]); // third function call
+        ]);
 
         return $this->render('index', $json);
     }
@@ -125,5 +125,3 @@ class HomeController extends Controller {
 ```
 
 Interesting! (to me) :)
-
-If the function knows what it's about to compute, it might be able to thread and optimize it. That's the point: helpful meta information.
