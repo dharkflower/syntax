@@ -1,4 +1,4 @@
-Let's say a web request comes in and here's the code of `**index.php**`, line by line:
+Let's say a web request comes in and here's the code of `index.php` line by line:
 
 - $kernel = new Kernel()
 - $output = $kernel->run()
