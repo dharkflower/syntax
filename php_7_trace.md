@@ -18,7 +18,7 @@ Let's break it down, as an example, and say that a request to /user traces like 
 ### Hypothesis
 In the same way a Symfony route can function trace at the PHP level, a Symfony route could function trace at the C level I think. You might have to compile a custom PHP binary meant for tracing, or maybe use an extension. I'm not sure.
 
-We could route-level know what sequence the PHP functions run in and then run Reflections classes against all of them to get a per-PHP-function dependency map of C functions each is using, and then combine all of the maps. We might be able to then use PHP source code as a reference and reconstruct the source code per-route in a `/tmp` folder or something.
+We could route-level know what sequence the PHP functions run in and then run Reflections classes against all of them to get a per-PHP-function dependency map of C functions each is using, and then combine all of the maps like you would a package.json. We might be able to then use PHP source code as a reference and reconstruct the source code per-route in a `/tmp` folder or something.
 
 The goal would be to programmatically Frankenstein sequence the C source code of each PHP function that's used and then compile it all into a route-specific PHP micro-binary. Then store it with an ID somewhere and do some Apache2 config to use micro-binaries if they're available instead of the full PHP binary. Potentially quiker than nes.
 
