@@ -169,6 +169,6 @@ class HomeController extends Controller {
 }
 ```
 
-And then some kind of import syntax like `HomeController ::: index => TRACK_USER;`.
+And then some kind of import syntax like `HomeController ::: index => TRACK_USER;`
 
 `scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be optimized on a more granular level - with threading. Smart threading.
