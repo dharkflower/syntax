@@ -86,12 +86,6 @@ Using `thread` could stick to a more strict approach or a more flexible one, all
 
 class HomeController extends Controller {
 
-    public function __construct (
-
-        private ContentRepository $repository
-
-    ) {}
-
     #[Route('/', name: 'index')]
     public function index (
 
@@ -146,7 +140,7 @@ class HomeController extends Controller {
 
     	thread {
 
-    		TRACK_USER => QUEUE,
+    		TRACK_USER,
     		HIT_API => SYNC
 
     	}
@@ -164,6 +158,12 @@ class HomeController extends Controller {
 
     	}
 
+        /*  // equivalent code execution order if running the `index` function
+            $user->trackPageView();
+            $user->save();
+            $data = hit_api();
+        */
+
         return $this->render('index', ['data' => $data]);
     }
 }
@@ -171,4 +171,4 @@ class HomeController extends Controller {
 
 And then some kind of import syntax like `HomeController ::: index => TRACK_USER;`
 
-`scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be optimized on a more granular level - with threading. Smart threading.
+`scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be optimized and threaded on both a more granular level and a more cross-class level type of threading. Smart threading.
