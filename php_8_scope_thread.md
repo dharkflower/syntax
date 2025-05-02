@@ -11,7 +11,7 @@ process.nextTick(() => {
     app.listen(3000)
 })
 ```
-This simple async pattern inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by outlining some details about the components the function will be using. By defining asynchronous elements in advance it might simplify under-the-hood threading. What if there was a new token that would facilitate some low-level performance improvements via some hinting that does stuff like asynchronous curl calls that *autostart* or something using a new token `thread` like this?
+This pattern inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. By defining threaded elements in advance it might simplify under-the-hood threading and allow some dynamic threading control at a per-function level. What if there was some hinting that does stuff like asynchronous curl calls that *autostart* or something using a new token `thread` like this?
 
 ```php
 <?php
@@ -74,12 +74,12 @@ class HomeController extends Controller {
 
         curl_close($ch);
 
-        return $this->render('index', $content);
+        return $this->render('index');
     }
 }
 ```
 
-Using `thread` could stick to a more strict approach or a more flexible one, allowing multiple types of tokens like function calls, constants, and objects. At a lower level, at the start of a function call when it hits `thread`, it could have certain per-method performance improvements that are made possible by the ability to more effectively manage what's happening. You could even have the `thread` block be required to have each declaration be in order, so that the declarations are accessed sequentially. Sort of like a `thread` array that is a forecast of what order each function is going to be executed in. Here's another example:
+Allowing multiple types of tokens like function calls, constants, and objects might facilitate some pretty dope C-level code coordination, but you could take a simpler approach and stick to sequential.
 
 ```php
 <?php
@@ -113,14 +113,14 @@ class HomeController extends Controller {
             'statusCode' => 200
         ]);
 
-        return $this->render('index', $json);
+        return $this->render('index');
     }
 }
 ```
 ### Scope
-Let's talk about an additional token that could be created that would allow some strange yet potentially efficient import patterns: `scope`
+Let's talk about an additional token that could be created that would allow some curiously potentially efficient import patterns: `scope`
 
-If `scope` was used to section out certain parts of the code of a function in a way that would allow the code to be imported elsewhere, it might provide a solid framework that could be combined with `thread`. Let's take a look at this code example:
+If `scope` was used to section out certain parts of the code of a function in a way that would allow the code block to be imported elsewhere, it might provide a solid framework that could be combined with `thread`. Let's take a look at this code example:
 
 ```php
 <?php
@@ -140,7 +140,6 @@ class HomeController extends Controller {
     	thread {
 
     		TRACK_USER,
-    		HIT_API => SYNC
 
     	}
 
@@ -157,17 +156,10 @@ class HomeController extends Controller {
 
     	}
 
-        /*  // equivalent code execution order if running the `index` function
-            $user->trackPageView();
-            $user->save();
-            $data = hit_api();
-        */
-
-        return $this->render('index', ['data' => $data]);
-    }
+     return $this->render('index', ['data' => $data]);
 }
 ```
 
-And then some kind of import syntax like `HomeController ::: index => TRACK_USER;`
+And then some kind of import syntax like `HomeController ::: index => HIT_API;`
 
-`scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be either threaded or ran async depending on how you configure it. Smart threading.
+`scope` begs the question of why certain blocks of code couldn't be either threaded or ran async depending on how they are configured. Smart, dynamic threading.
