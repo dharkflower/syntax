@@ -35,7 +35,7 @@ class HomeController extends Controller {
         thread {
 
             // some properties
-            $this->repository
+            $this->repository,
 
             // some function calls
             curl_init,
@@ -127,7 +127,6 @@ If `scope` was used to section out certain parts of the code of a function in a 
 
 namespace App\Controller;
 
-
 class HomeController extends Controller {
 
     #[Route('/', name: 'index')]
@@ -171,4 +170,4 @@ class HomeController extends Controller {
 
 And then some kind of import syntax like `HomeController ::: index => TRACK_USER;`
 
-`scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be optimized and threaded on both a more granular level and a more cross-class level type of threading. Smart threading.
+`scope` is kind of a weird idea because if you're importing pieces of a function into other functions it begs the question of why certain blocks of code couldn't be either threaded or ran async depending on how you configure it. Smart threading.
