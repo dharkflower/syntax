@@ -123,8 +123,8 @@ class HomeController extends Controller {
     }
 }
 ```
-
-Okay quick sidequest for a second. Let's talk about an additional token that could be created that would allow some strange yet potentially efficient import patterns: `scope`
+### Scope
+Let's talk about an additional token that could be created that would allow some strange yet potentially efficient import patterns: `scope`
 
 If `scope` was used to section out certain parts of the code of a function in a way that would allow the code to be imported elsewhere, it might provide a solid framework that could be combined with `thread`. Let's take a look at this code example:
 
