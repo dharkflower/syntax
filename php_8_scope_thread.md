@@ -11,7 +11,7 @@ process.nextTick(() => {
     app.listen(3000)
 })
 ```
-This Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. By defining threaded scopes in advance it might allow some pretty dynamic threading control at a per-function level. What if it did stuff like a curl post that *autostarts* and then waits or something using a new block type `thread`?
+This Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. By defining threaded scopes in advance it might allow some pretty dynamic threading control at a per-function level. What if there was a new block type `thread`?
 
 Allowing multiple types of tokens in it like function calls, constants, and objects might facilitate some pretty dope C-level code coordination, but you could take a simpler approach like this:
 
@@ -41,7 +41,7 @@ class HomeController extends Controller {
             'data' => 'ok'
         ]);
 
-        return json_encode($json);
+        return $json;
     }
 }
 ```
