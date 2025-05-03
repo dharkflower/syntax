@@ -3,50 +3,19 @@
 ```javascript
 // source some libs
 import { createServer } from 'express'
-import React from 'react'
+const port = 3000
 
 // do something asynchronous
 process.nextTick(() => {
     const app = createServer(() => {})
-    app.listen(3000)
+    app.listen(port)
 })
 ```
-This Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. By defining threaded scopes in advance it might allow some pretty dynamic threading control at a per-function level. What if there was a new block type `thread`?
+This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute. It's some pretty dynamic threading control at a per-function level. What if there was a new block type `thread`?
 
-Allowing multiple types of tokens in it like function calls, constants, and objects might facilitate some pretty dope C-level code coordination, but you could take a simpler approach like this:
+Allowing multiple types of tokens in it like function calls, constants, and objects might facilitate some pretty dope C-level code coordination.
 
-```php
-<?php
-
-class HomeController extends Controller {
-
-    #[Route('/', name: 'index')]
-    public function index (
-
-        Request $request,
-        User $user
-
-    ) : Response {
-
-        thread {
-
-            str_replace,
-            rand,
-
-        }
-
-        $header = str_replace('', '', $request->header1);
-        $number = rand(1, 10);
-        $json = json_encode([
-            'data' => 'ok'
-        ]);
-
-        return $json;
-    }
-}
-```
-### Scope
-Let's talk about an additional code block type, though, that could be created that would allow some curiously potentially efficient import patterns and potentially provide a needed architecture for more complex threading patterns: `scope`
+A new block type `scope` could be created with this that would allow some curiously potentially efficient import patterns as well as provide a needed architecture for more complex threaded code.
 
 Let's take a look at this code example:
 
