@@ -53,6 +53,7 @@ class IndexController extends Controller {
         // it just doesn't run **right now** even though it's synchronous
         // you can still call the scope later
         // even in the parent scope of GET_GENERIC_VIEWS
+
         #[Dormant]
         scope GET_GENERIC_VIEWS {
 
@@ -60,20 +61,17 @@ class IndexController extends Controller {
             return get_generic_views();
         }
 
-        // the FETCH_DATA scope runs synchronously
-        // if defined as dormant, it can still run
-        // 
         #[Dormant]
         scope FETCH_DATA {
 
-            // this does not make the `index` func return, it makes FETCH_DATA return
+            // this does not make the `index` func return
+            // it makes FETCH_DATA return
             return fetch_data();
         }
 
-        // scope yields variable to inject Twig with
+        // FETCH_DATA scope yields data
         return $this->render('index', [
             'data' => FETCH_DATA,
-            'data' => scope FETCH_DATA, // or ?
         ]);
     }
 }
@@ -85,7 +83,7 @@ It's a little meta to have another depth of stuff that you can import, fair.
 
 But the point of scopes is smart, dynamic, low-level threading. `scope` begs questions.
 
-I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out the ES6 import formatting:
+I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out some ES6 import formatting:
 
 ```javascript
 // proper
@@ -104,7 +102,7 @@ from 'react' import {
 }
 ```
 
-The reason I include this is to show off how well Node.js has done with keeping up to date with edge UX trends; if I were to mimick one thing from Node.js in a PHP syntax idea it would be based on the above. Huge fan.
+The reason I include this is to show off how well Node.js has done with keeping up to date with edge code UX trends; if I were to mimick one thing from Node.js in a PHP syntax idea it would be based on the latter. Huge fan.
 
 Full snippet, here's a fully namespaced PHP class with some scope and class imports:
 
@@ -124,11 +122,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 // proper
-scope App\Controller\IndexController ::: index => TRACK_GENERIC_VIEW; // explicit, neat
-scope App\Controller\IndexController ::: index => GET_GENERIC_VIEWS; // same
+scope IndexController ::: index => TRACK_GENERIC_VIEW; // explicit, neat
+scope IndexController ::: index => GET_GENERIC_VIEWS; // same
 
 // list style
-scope App\Controller\IndexController ::: index {
+scope IndexController ::: index {
 
     TRACK_GENERIC_VIEW,
     GET_GENERIC_VIEWS,
@@ -136,7 +134,7 @@ scope App\Controller\IndexController ::: index {
 }
 
 // list style other
-scope App\Controller\IndexController {
+scope IndexController {
 
     index ::: {
 
