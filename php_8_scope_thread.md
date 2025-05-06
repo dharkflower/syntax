@@ -14,7 +14,7 @@ process.nextTick(() => {
 })
 ```
 
-This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining some threading logic with new block types `thread` and `scope`
+This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable elements via new code block types `thread` and `scope`
 
 Allowing multiple types of tokens in `thread` like `scope` references, function calls, constants, variables, imported classes, and objects might facilitate some pretty dope C-level code coordination.
 
@@ -49,8 +49,10 @@ class IndexController extends Controller {
 
         }
 
-        // the GET_GENERIC_VIEWS scope gets defined but never ran and lies dormant
-        // still allowed to be imported, it just doesn't default run in this scope
+        // the GET_GENERIC_VIEWS scope is dormant
+        // it just doesn't run **right now** even though it's synchronous
+        // you can still call the scope later
+        // even in the parent scope of GET_GENERIC_VIEWS
         #[Dormant]
         scope GET_GENERIC_VIEWS {
 
@@ -59,7 +61,8 @@ class IndexController extends Controller {
         }
 
         // the FETCH_DATA scope runs synchronously
-        // if defined as dormant, it can still be scoped into Twig later
+        // if defined as dormant, it can still run
+        // 
         #[Dormant]
         scope FETCH_DATA {
 
