@@ -1,5 +1,7 @@
 ### adapt
-I don't think this is a threat to a more standard architecture like something built on Symfony Messenger; I think it might even compliment it. It's just some code golf that could have some under-the-hood speed improvements if harnessed correctly and provide some simplifications for people coding dynamic math-heavy applications - like a load balancer, for example. Here's a simple example without `adapt`:
+This is just some code golf that could have some under-the-hood speed improvements if harnessed correctly and provide some simplifications for people trying to create logic that pivots off of the state of other things.
+
+Take this snippet into consideration:
 
 ```php
 <?php
@@ -35,7 +37,7 @@ class HomeController {
 }
 
 ```
-What if we abstracted out some of the mathematical type code we write with a new type/token called `adapt` that is meant to dynamically accomplish the same thing as above? It could select a value from a set of numbers based on criteria like load. I imagine it working something like this - at least, without defining the criteria as load:
+What if we abstracted out some of the mathematical type code we write with a new type/token called `adapt` that is meant to dynamically accomplish the same thing as above? It could select a value from a set of numbers based on criteria like load. I imagine it working something like this without defining the criteria as load:
 ```php
 <?php
 
@@ -59,9 +61,9 @@ What if we abstracted out some of the mathematical type code we write with a new
     }
 ```
 ### What's the point?
-It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines something like number of compute-intensive iterations there is an opportunity to make micro-decisions on not just what to think but when *not to* and throw in the towel - in the name of performance. It makes way for other computations by arming each thread with logical deductive reasoning that smoothly knows when to limit itself, if you think about it; killing off zombie threads is a form of thinking backwards.
+It's just potentially a concept that actually exists in the AI realm; for every "forgivable, bendable, stretchable" variable that determines something like number of compute-intensive iterations to run there is an opportunity to make micro-decisions on not just what to think but when *not to* think and throw in the towel in the name of performance. It makes way for other computations by arming it with reasoning that smoothly knows when to limit itself, if you think about it; logically calculating what zombie threads to kill off is a form of thinking backwards.
 
-It's almost like a switch case or a CSS3 keyframes transition. It could end up being something like this:
+It's almost like it could be a switch case or a CSS3 keyframes transition. It could end up being something like this:
 ```php
 <?php
 
@@ -79,16 +81,8 @@ adapt ($iterations) {
 ```
 The coolest thing about this is that `adapt` doesn't only have to determine iterations, and wouldn't actually need to select based on load; that's just an example of adapting an important iteration variable. Basically `adapt` could abstract out a pretty smooth API to mathematically react to things based on other things - generally.
 
-I think there is a syntax to be had that allows a sort of definition of what criteria determines selection of a value but I have been having a hard time starting on it for a few reasons:
-
-- that's some complex logic to be encapsulated in such a short line and syntax
-- other stuff
-- trying to wrap my head around how to make it super duper flexible
-
-Here's what I have so far.
-
-- I want the syntax to be able to define a shell command to run to determine adaption criteria
-- I also want the syntax to be able to define a class to automatically run as an adaption criteria definition determiner
+- I would want the syntax to be able to define a shell command to run to determine adaption criteria
+- I would also want the syntax to be able to define a class to automatically run as an adaption criteria definition determiner
 
 This has been leading to some syntax ideas that go something like this, I'm going to just sketch them all out and do your best to understand what kind of logic it would execute. Crude, not well-thought-out examples. Will update soon.
 
@@ -118,11 +112,11 @@ This has been leading to some syntax ideas that go something like this, I'm goin
         $iterations = (adapt) $values;
 
         // but we need to be able to define adaptation criteria one of two ways:
-        $criteria = 'top -b -n 1 | grep "load average" | awk "{print $10, $11, $12}"; // a shell command, example command to determine system load
+        $criteria = 'top -b -n 1 | grep "load average" | awk "{print $10, $11, $12}"'; // a shell command, example command to determine system load
         $iterations = (adapt) $values $criteria;
 
         // or through a reference to an adaptation criteria determiner class
-        $iterations = (adapt) $values SystemLoadAdaptation;
+        $iterations = (adapt) $values SystemLoadAdaptation::class;
 
         // runs either 100, 75, 50, or 25 times
         for ($i = 0; $i < $iterations; $i++) {
