@@ -1,7 +1,4 @@
-Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here; if `thread` and `scope` were to be implemented, it would be a lot more likely to be possible to C-level trace a Symfony route and Frankenstein it back together in the name of speed. These new code block types would help bring some definition and clarity to what is supposed to be threaded and how.
-
-### Impossible/Please/Someone
-If scopes could have access to their parents' injected dependencies... whoa. Smooth. Much more powerful than a specialized type of function. 
+Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here.
 
 Lots to talk about. Let us proceed.
 
@@ -42,6 +39,9 @@ class IndexController extends Controller {
 
         scope TRACK_GENERIC_VIEW {
 
+            // has access to $user variable..............
+            // dependency injection nightmare importing it but oh so smooth
+            // seamless flow into and out of the scope
             $user->trackGenericView();
             $user->save();
 
@@ -58,7 +58,6 @@ class IndexController extends Controller {
         // it just doesn't run **right now** even though it's synchronous
         // you can still call the scope later
         // even in the parent scope of GET_GENERIC_VIEWS
-
         #[Dormant]
         scope GET_GENERIC_VIEWS {
 
@@ -84,9 +83,7 @@ class IndexController extends Controller {
 
 Maybe some coffee and bring into existence some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code. `scope` is a `code block` that gets followed into and interpreted like an if statement.
 
-It's a little meta to have another depth of stuff that you can import, fair.
-
-But the point of scopes is smart, dynamic, low-level threading. `scope` begs questions.
+It's a little meta to have another depth of stuff that you can import, fair. But the main point of scopes are smart, dynamic, low-level threading. You might be able to even do some kind of caching of them or some kind of static scope that can be accessed from different threads. Weird.
 
 I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out some ES6 import formatting:
 
@@ -117,21 +114,20 @@ Full snippet, here's a fully namespaced PHP class with some scope and class impo
 // correct namespace
 namespace App\Controller;
 
-// you probably need to import the class that contains scope code
-use App\Controller\IndexController;
-
 // core imports
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-// all scope importing
-// proper
-scope IndexController ::: index => TRACK_GENERIC_VIEW; // explicit, neat
-scope IndexController ::: index => GET_GENERIC_VIEWS; // same
+// you probably need to import the class that contains scope code
+scope App\Controller\IndexController;
 
-// list style
+// proper
+scope IndexController\index => TRACK_GENERIC_VIEW; // explicit, neat
+scope IndexController\index => GET_GENERIC_VIEWS; // same
+
+// or list style
 scope IndexController ::: index {
 
     TRACK_GENERIC_VIEW,
@@ -139,7 +135,7 @@ scope IndexController ::: index {
 
 }
 
-// list style other
+// or list style other
 scope IndexController ::: {
 
     index {
