@@ -163,7 +163,7 @@ class AnalyticsController extends AbstractController {
         // important: synchronous here
         TRACK_GENERIC_VIEW;
 
-        // if you must, prefix with `scope` to not interfere with existing syntax
+        // or, if you must, prefix with `scope` to not interfere with existing syntax
         // important: synchronous here
         scope TRACK_GENERIC_VIEW;
 
