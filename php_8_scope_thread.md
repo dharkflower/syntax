@@ -59,28 +59,28 @@ class IndexController extends Controller {
         }
 
         // the FETCH_DATA scope runs synchronously
-        $data = scope FETCH_DATA {
+        // if defined as dormant, it can still be scoped into Twig later
+        #[Dormant]
+        scope FETCH_DATA {
 
-            // this does not make `index` return, it makes FETCH_DATA return
+            // this does not make the `index` func return, it makes FETCH_DATA return
             return fetch_data();
         }
 
-        // synchronous stuff wraps up and yields variable to inject Twig with
+        // scope yields variable to inject Twig with
         return $this->render('index', [
-
-            'data' => $data, // basic variable injection
-            'data' => scope FETCH_DATA, // or, a cool, fancy, new injection method
-
+            'data' => FETCH_DATA,
+            'data' => scope FETCH_DATA, // or ?
         ]);
     }
 }
 ```
 
-Maybe some coffee and bring into existence some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code.
+Maybe some coffee and bring into existence some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code. `scope` is a `code block` that gets followed into and interpreted like an if statement.
 
 It's a little meta to have another depth of stuff that you can import, fair.
 
-`scope` begs questions. The point of scopes is smart, dynamic, low-level threading. All of it still gets ran; it's a `code block` that gets followed into and interpreted like an if statement.
+But the point of scopes is smart, dynamic, low-level threading. `scope` begs questions.
 
 I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out the ES6 import formatting:
 
@@ -94,7 +94,7 @@ import {
     createClass, // trailing commas not allowed but maybe they should be allowed
 } from 'react' // this line looks out of place
 
-// somehow
+// somehow I wish this was how it worked
 from 'react' import {
     createElement,
     createClass,
@@ -160,6 +160,7 @@ class AnalyticsController extends AbstractController {
         // it needs to be synchronous here because it's the analytics page and it needs to be accurate, now
         // two different usages of code in two places in two different ways
         // to drop-in use a scope synchronously, just trail it with a semicolon
+        // important: synchronous here
         TRACK_GENERIC_VIEW;
 
         // if you must, prefix with `scope` to not interfere with existing syntax
@@ -177,3 +178,14 @@ class AnalyticsController extends AbstractController {
     }
 }
 ```
+I would openly invite anyone from the following communities to jump in on this, just as a starting point:
+
+- PHP
+- Linux
+- Symfony
+- Drupal
+- Node.js
+- Python
+- Django
+- Ruby
+- Rails
