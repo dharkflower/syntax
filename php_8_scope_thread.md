@@ -81,8 +81,6 @@ class IndexController extends Controller {
 }
 ```
 
-Maybe some coffee and bring into existence some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code. `scope` is a `code block` that gets followed into and interpreted like an if statement.
-
 It's a little meta to have another depth of stuff that you can import, fair. But the main point of scopes are smart, dynamic, low-level threading. You might be able to even do some kind of caching of them or some kind of static scope that can be accessed from different threads. Weird.
 
 I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out some ES6 import formatting:
