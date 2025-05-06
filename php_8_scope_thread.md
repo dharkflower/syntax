@@ -1,3 +1,5 @@
+Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here; if `thread` and `scope` were to be implemented, it would be a lot more likely to be possible to C-level trace a Symfony route and Frankenstein it back together in the name of speed. These new code block types would help bring some definition and clarity to what is supposed to be threaded and how.
+
 ### Asynchronous Pattern
 
 ```javascript
@@ -11,21 +13,17 @@ process.nextTick(() => {
     app.listen(port)
 })
 ```
+
 This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining some threading logic with new block types `thread` and `scope`
 
 Allowing multiple types of tokens in `thread` like `scope` references, function calls, constants, variables, imported classes, and objects might facilitate some pretty dope C-level code coordination.
 
 ```php
-<?php
-
-namespace App\Controller;
-
 class IndexController extends Controller {
 
     #[Route('/', name: 'index')]
     public function index (
 
-        Request $request,
         User $user
 
     ) : Response {
@@ -51,8 +49,10 @@ class IndexController extends Controller {
 
         }
 
-        // the GET_GENERIC_VIEWS scope runs synchronously
-        $views = scope GET_GENERIC_VIEWS {
+        // the GET_GENERIC_VIEWS scope gets defined but never ran and lies dormant
+        // still allowed to be imported, it just doesn't default run in this scope
+        #[Dormant]
+        scope GET_GENERIC_VIEWS {
 
             // pretend get_generic_views is a real function
             return get_generic_views();
@@ -65,33 +65,86 @@ class IndexController extends Controller {
             return fetch_data();
         }
 
-        // the GET_GENERIC_VIEWS scope yields the $views variable
-        // the FETCH_DATA scope yields the $data variable, which is now available in this scope
-        // $data = FETCH_DATA;` in other places will fetch the result into the variable
-
+        // synchronous stuff wraps up and yields variable to inject Twig with
         return $this->render('index', [
-            'data' => $data,
-            'views' => $views,
+
+            'data' => $data, // basic variable injection
+            'data' => scope FETCH_DATA, // or, a cool, fancy, new injection method
+
         ]);
     }
 }
 ```
 
-And then some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code. It's a little meta. Fair. But `scope` is versatile like `use`
+Maybe some coffee and bring into existence some kind of import syntax like `scope IndexController ::: index => TRACK_GENERIC_VIEW;` that allows you to import (and thread, if you want to) scopes of code.
 
-`scope` begs questions. Smart, dynamic threading. It doesn't prevent the code from getting executed, all of it still gets ran; it's a `code block type` that gets followed into and interpreted like an if statement.
+It's a little meta to have another depth of stuff that you can import, fair.
 
-Interesting. Here's an example of a thread definition of a scope import:
+`scope` begs questions. The point of scopes is smart, dynamic, low-level threading. All of it still gets ran; it's a `code block` that gets followed into and interpreted like an if statement.
+
+I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out the ES6 import formatting:
+
+```javascript
+// proper
+import { createElement, createClass } from 'react'
+
+// list style of yuck
+import {
+    createElement,
+    createClass, // trailing commas not allowed but maybe they should be allowed
+} from 'react' // this line looks out of place
+
+// somehow
+from 'react' import {
+    createElement,
+    createClass,
+}
+```
+
+The reason I include this is to show off how well Node.js has done with keeping up to date with edge UX trends; if I were to mimick one thing from Node.js in a PHP syntax idea it would be based on the above. Huge fan.
+
+Full snippet, here's a fully namespaced PHP class with some scope and class imports:
 
 ```php
 <?php
 
+// correct namespace
 namespace App\Controller;
 
-scope App\IndexController ::: index => TRACK_GENERIC_VIEW;
-scope App\IndexController ::: index => GET_GENERIC_VIEWS;
+// you probably need to import the class that contains scope code
+use App\Controller\IndexController;
 
-class AnalyticsController extends Controller {
+// core imports
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+// proper
+scope App\Controller\IndexController ::: index => TRACK_GENERIC_VIEW; // explicit, neat
+scope App\Controller\IndexController ::: index => GET_GENERIC_VIEWS; // same
+
+// list style
+scope App\Controller\IndexController ::: index {
+
+    TRACK_GENERIC_VIEW,
+    GET_GENERIC_VIEWS,
+
+}
+
+// list style other
+scope App\Controller\IndexController {
+
+    index ::: {
+
+        TRACK_GENERIC_VIEW,
+        GET_GENERIC_VIEWS,
+
+    }
+
+}
+
+class AnalyticsController extends AbstractController {
 
     #[Route('/analytics', name: 'analytics')]
     public function analytics (
@@ -110,9 +163,14 @@ class AnalyticsController extends Controller {
         TRACK_GENERIC_VIEW;
 
         // if you must, prefix with `scope` to not interfere with existing syntax
+        // important: synchronous here
         scope TRACK_GENERIC_VIEW;
+
+        // now that the synchronous TRACK_GENERIC_VIEW scope has ran, you can pull a full report
+        // import GET_GENERIC_VIEWS even though it's dormant where it's defined
         $views = scope GET_GENERIC_VIEWS;
 
+        // inject the full report into Twig
         return $this->render('analytics', [
             'views' => $views
         ]);
