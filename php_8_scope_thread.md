@@ -34,29 +34,38 @@ class HomeController extends Controller {
 
     ) : Response {
 
-    	thread {
+        thread {
 
-    		TRACK_USER,
+            TRACK_GENERIC_VIEW,
+            TRACK_SPECIFIC_VIEW,
 
-    	}
+        }
 
-    	scope TRACK_USER {
+        scope TRACK_GENERIC_VIEW {
 
-    		$user->trackPageView();
-    		$user->save();
+            $user->trackGenericView();
+            $user->save();
 
-    	}
+        }
 
-    	scope HIT_API {
+        scope TRACK_SPECIFIC_VIEW {
 
-    		$data = hit_api();
+            $user->trackSpecificView('index');
+            $user->save();
 
-    	}
+        }
 
-     return $this->render('index', ['data' => $data]);
+        scope HIT_API {
+
+            $data = hit_api();
+
+        }
+
+        return $this->render('index', ['data' => $data]);
+    }
 }
 ```
 
 And then some kind of import syntax like `HomeController ::: index => HIT_API;`
 
-`scope` begs questions. Smart, dynamic threading.
+`scope` begs questions. Smart, dynamic threading. It doesn't prevent the code from getting executed, all of it still gets ran; it's a `code block type` that gets followed into and interpreted. Interesting.
