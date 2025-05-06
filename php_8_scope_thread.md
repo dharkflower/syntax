@@ -1,11 +1,11 @@
 ### Asynchronous Pattern
 
 ```javascript
-// source some libs
+// do some stuff
 import { createServer } from 'express'
 const port = 3000
 
-// do something asynchronous
+// do some stuff later with that stuff
 process.nextTick(() => {
     const app = createServer(() => {})
     app.listen(port)
@@ -66,6 +66,6 @@ class HomeController extends Controller {
 }
 ```
 
-And then some kind of import syntax like `HomeController ::: index => HIT_API;`
+And then some kind of import syntax like `HomeController ::: index => HIT_API;` that allows you to import (and thread, if you want to) scopes of code. It's a little meta. Fair.
 
-`scope` begs questions. Smart, dynamic threading. It doesn't prevent the code from getting executed, all of it still gets ran; it's a `code block type` that gets followed into and interpreted. Interesting.
+But `scope` begs questions. Smart, dynamic threading. It doesn't prevent the code from getting executed, all of it still gets ran; it's a `code block type` that gets followed into and interpreted. Interesting.
