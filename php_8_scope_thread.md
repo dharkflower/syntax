@@ -1,7 +1,7 @@
 Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here; if `thread` and `scope` were to be implemented, it would be a lot more likely to be possible to C-level trace a Symfony route and Frankenstein it back together in the name of speed. These new code block types would help bring some definition and clarity to what is supposed to be threaded and how.
 
-### Goal
-Let it be known that the main goal for this syntax idea, I think, should be that if you import a scope from another place, dependencies of that place get sorted out and injected. The biggest occurrence of this conversation in the following examples are the `User` class; it references a $user variable that isn't defined in the scope.
+### Impossible/Please/Someone
+If scopes could have access to their parents' injected dependencies... whoa. Smooth. Much more powerful than a specialized type of function. 
 
 Lots to talk about. Let us proceed.
 
