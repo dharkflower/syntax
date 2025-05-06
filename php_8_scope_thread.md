@@ -121,6 +121,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+// all scope importing
 // proper
 scope IndexController ::: index => TRACK_GENERIC_VIEW; // explicit, neat
 scope IndexController ::: index => GET_GENERIC_VIEWS; // same
@@ -134,9 +135,9 @@ scope IndexController ::: index {
 }
 
 // list style other
-scope IndexController {
+scope IndexController ::: {
 
-    index ::: {
+    index {
 
         TRACK_GENERIC_VIEW,
         GET_GENERIC_VIEWS,
@@ -179,14 +180,3 @@ class AnalyticsController extends AbstractController {
     }
 }
 ```
-I would openly invite anyone from the following communities to jump in on this, just as a starting point:
-
-- PHP
-- Linux
-- Symfony
-- Drupal
-- Node.js
-- Python
-- Django
-- Ruby
-- Rails
