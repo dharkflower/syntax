@@ -11,13 +11,9 @@ process.nextTick(() => {
     app.listen(port)
 })
 ```
-This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute with a new block type `thread`.
+This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining some threading logic with new block types `thread` and `scope`
 
-Allowing multiple types of tokens in it like function calls, constants, and objects might facilitate some pretty dope C-level code coordination.
-
-A new block type `scope` could be created along with this that would allow some curiously potentially efficient code import patterns as well as provide a needed architecture for complex threaded code.
-
-Let's take a look at this code example:
+Allowing multiple types of tokens in `thread` like `scope` references, function calls, constants, variables, imported classes, and objects might facilitate some pretty dope C-level code coordination.
 
 ```php
 <?php
