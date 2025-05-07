@@ -67,7 +67,7 @@ class IndexController extends Controller {
             return [4, 5];
         }
 
-        scope FETCH_DATA {
+        dormant scope FETCH_DATA {
 
             // returning FETCH_DATA yields a var
             return [3];
