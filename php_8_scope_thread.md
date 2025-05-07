@@ -16,7 +16,7 @@ process.nextTick(() => {
 })
 ```
 
-This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable elements via new code block types `thread` and `scope`
+This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable and importable elements via new tokens `thread` and `scope`
 
 Allowing multiple types of tokens in `thread` like `scope` references, function calls, constants, variables, imported classes, and objects might facilitate some pretty dope C-level code coordination.
 
@@ -39,9 +39,8 @@ class IndexController extends Controller {
 
         scope TRACK_GENERIC_VIEW {
 
-            // has access to $user variable..............
-            // dependency injection nightmare importing it but oh so smooth
-            // seamless flow into and out of the scope
+            // has access to $user variable somehow..............
+            // dependency injection nightmare but oh so smooth
             $user->trackGenericView();
             $user->save();
 
@@ -55,21 +54,21 @@ class IndexController extends Controller {
         }
 
         // the GET_GENERIC_VIEWS scope is dormant
-        // it just doesn't run **right now** even though it's synchronous
+        // so it doesn't run **right now** even though it's synchronous and not defined as threaded
         // you can still call the scope later
-        // even in the parent scope of GET_GENERIC_VIEWS
+        // even in the parent scope
         #[Dormant]
         scope GET_GENERIC_VIEWS {
 
-            // pretend get_generic_views is a real function
+            // pretend for a sec
             return get_generic_views();
         }
 
-        #[Dormant]
+        // another dummy 
         scope FETCH_DATA {
 
-            // this does not make the `index` func return
-            // it makes FETCH_DATA return
+            // this return statement does not make the `index` func return
+            // it makes FETCH_DATA yield a var
             return fetch_data();
         }
 
@@ -81,35 +80,15 @@ class IndexController extends Controller {
 }
 ```
 
-It's a little meta to have another depth of stuff that you can import, fair. But the main point of scopes are smart, dynamic, low-level threading. You might be able to even do some kind of caching of them or some kind of static scope that can be accessed from different threads. Weird.
+It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) are smart, dynamic, low-level threading. You might be able to even do some kind of caching of them or some kind of static scope that can be accessed from different threads. Weird. PHP 2.0. :)
 
-I will admit it's close to just being a type of function but even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it. Check out some ES6 import formatting:
-
-```javascript
-// proper
-import { createElement, createClass } from 'react'
-
-// list style of yuck
-import {
-    createElement,
-    createClass, // trailing commas not allowed but maybe they should be allowed
-} from 'react' // this line looks out of place
-
-// somehow I wish this was how it worked
-from 'react' import {
-    createElement,
-    createClass,
-}
-```
-
-The reason I include this is to show off how well Node.js has done with keeping up to date with edge code UX trends; if I were to mimick one thing from Node.js in a PHP syntax idea it would be based on the latter. Huge fan.
+I will admit it's close to just being a type of function if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it.
 
 Full snippet, here's a fully namespaced PHP class with some scope and class imports:
 
 ```php
 <?php
 
-// correct namespace
 namespace App\Controller;
 
 // core imports
@@ -118,10 +97,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-// you probably need to import the class that contains scope code
+// scope in the class
+// different than `use`
 scope App\Controller\IndexController;
 
-// proper
+// short qualifier
+// with the extra granularity qualifier `index`
 scope IndexController\index => TRACK_GENERIC_VIEW; // explicit, neat
 scope IndexController\index => GET_GENERIC_VIEWS; // same
 
