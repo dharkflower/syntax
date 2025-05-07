@@ -40,6 +40,7 @@ class IndexController extends Controller {
 
             // has access to $user variable somehow.......
             // dependency injection hell but oh so smooth
+            // vanilla scope blocks are entered then exited
             $user->trackGenericView();
             $user->save();
 
@@ -52,8 +53,13 @@ class IndexController extends Controller {
 
         }
 
-        // mentioned idea later sorry
+        // this gets cached with an hour TTL
+        // just an example
         static scope GET_CURRENT_HOUR : 3600 {
+
+            // this gets 
+            // I don't know if this is right :)
+            return date('H');
         }
 
         // the GET_GENERIC_VIEWS scope is dormant
