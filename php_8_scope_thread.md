@@ -1,8 +1,6 @@
 Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here.
 
-Lots to talk about. Let us proceed.
-
-### Asynchronous Pattern
+Lots to talk about. Let us proceed. Node.js snippet that inspired this syntax idea:
 
 ```javascript
 // do some stuff
@@ -16,9 +14,9 @@ process.nextTick(() => {
 })
 ```
 
-This little Node.js snippet inspired this syntax idea. At the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable and importable elements via new tokens `thread` and `scope`
+What if at the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable elements via new tokens `thread` and `scope`
 
-Allowing multiple types of tokens in `thread` like `scope` references, function calls, constants, variables, imported classes, and objects might facilitate some pretty dope C-level code coordination.
+Allowing multiple types of tokens in `thread` like scope references, function calls, constants, variables, imported classes, and instantiated objects might facilitate some pretty dope C-level code coordination.
 
 ```php
 class IndexController extends Controller {
@@ -32,15 +30,16 @@ class IndexController extends Controller {
 
         thread {
 
-            TRACK_GENERIC_VIEW, // doesn't need to block user interaction
-            TRACK_SPECIFIC_VIEW, // doesn't need to block user interaction
+            // neither of these need to block UX
+            TRACK_GENERIC_VIEW,
+            TRACK_SPECIFIC_VIEW,
 
         }
 
         scope TRACK_GENERIC_VIEW {
 
-            // has access to $user variable somehow..............
-            // dependency injection nightmare but oh so smooth
+            // has access to $user variable somehow.......
+            // dependency injection hell but oh so smooth
             $user->trackGenericView();
             $user->save();
 
@@ -53,23 +52,25 @@ class IndexController extends Controller {
 
         }
 
-        // the GET_GENERIC_VIEWS scope is dormant
-        // so it doesn't run **right now** even though it's synchronous and not defined as threaded
-        // you can still call the scope later
-        // even in the parent scope
-        #[Dormant]
-        scope GET_GENERIC_VIEWS {
-
-            // pretend for a sec
-            return get_generic_views();
+        // mentioned idea later sorry
+        static scope GET_CURRENT_HOUR : 3600 {
         }
 
-        // another dummy 
+        // the GET_GENERIC_VIEWS scope is dormant
+        // so it doesn't run
+        // even though not defined as threaded
+        // you can still call the scope later
+        // even in the parent scope
+        dormant scope GET_GENERIC_VIEWS {
+
+            // returning GET_GENERIC_VIEWS yields var
+            return [4, 5];
+        }
+
         scope FETCH_DATA {
 
-            // this return statement does not make the `index` func return
-            // it makes FETCH_DATA yield a var
-            return fetch_data();
+            // returning FETCH_DATA yields a var
+            return [3];
         }
 
         // FETCH_DATA scope yields data
@@ -80,9 +81,9 @@ class IndexController extends Controller {
 }
 ```
 
-It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) are smart, dynamic, low-level threading. You might be able to even do some kind of caching of them or some kind of static scope that can be accessed from different threads. Weird. PHP 2.0. :)
+It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) is smart, dynamic, low-level, configurable with syntax threading. You might be able to even do some kind of scope caching. If the scope is decorated or defined as cacheable with a TTL then I guess you don't need to run it? Weird. PHP 2.0. :)
 
-I will admit it's close to just being a type of function if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it.
+I will admit it's close to just being a type of function or class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it.
 
 Full snippet, here's a fully namespaced PHP class with some scope and class imports:
 
@@ -97,14 +98,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-// scope in the class
-// different than `use`
+// pull in the class that has the methods with scopes
+// different than `use` so a few different options here
+// some of it pulling some concepts from Symfony routing
 scope App\Controller\IndexController;
 
 // short qualifier
 // with the extra granularity qualifier `index`
-scope IndexController\index => TRACK_GENERIC_VIEW; // explicit, neat
-scope IndexController\index => GET_GENERIC_VIEWS; // same
+scope IndexController\index => TRACK_GENERIC_VIEW;
+scope IndexController\index => GET_GENERIC_VIEWS;
 
 // or list style
 scope IndexController ::: index {
@@ -138,24 +140,17 @@ class AnalyticsController extends AbstractController {
         // an example of wanting to use a scope synchronously and asynchronously in different places
         // in the IndexController, TRACK_GENERIC_VIEW didn't need to block for the UX
         // in the AnalyticsController, TRACK_GENERIC_VIEW needs to block
-        // the reason why, in a business intelligence setting, is because it needs that last view to track
-        // it needs to be synchronous here because it's the analytics page and it needs to be accurate, now
         // two different usages of code in two places in two different ways
-        // to drop-in use a scope synchronously, just trail it with a semicolon
+        // to drop-in use a scope synchronously
+        // I forget what those >>> blocks are called
+        // they bother me so cross functionality syntax
         // important: synchronous here
         TRACK_GENERIC_VIEW;
 
-        // or, if you must, prefix with `scope` to not interfere with existing syntax
-        // important: synchronous here
-        scope TRACK_GENERIC_VIEW;
-
-        // now that the synchronous TRACK_GENERIC_VIEW scope has ran, you can pull a full report
-        // import GET_GENERIC_VIEWS even though it's dormant where it's defined
-        $views = scope GET_GENERIC_VIEWS;
-
+        // now that the TRACK_GENERIC_VIEW scope has ran synchronously, you can pull a full report
         // inject the full report into Twig
         return $this->render('analytics', [
-            'views' => $views
+            'views' => GET_GENERIC_VIEWS
         ]);
     }
 }
