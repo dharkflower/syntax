@@ -36,14 +36,16 @@ class IndexController extends Controller {
 
         }
 
+        // vanilla enters here as if it was an if (TRUE)
         scope TRACK_GENERIC_VIEW {
 
             // has access to $user variable somehow.......
             // dependency injection hell but oh so smooth
-            // vanilla scope blocks are entered then exited
             $user->trackGenericView();
             $user->save();
 
+            // either returns var from scope
+            // or does nothing and moves on
         }
 
         scope TRACK_SPECIFIC_VIEW {
@@ -53,17 +55,17 @@ class IndexController extends Controller {
 
         }
 
-        // this gets cached with an hour TTL
-        // just an example
+        // this gets cached, gets the hour with an hour TTL
         static scope GET_CURRENT_HOUR : 3600 {
 
-            // this gets 
-            // I don't know if this is right :)
-            return date('H');
+            // returns the hour once per hour
+            // weird
+            return date('h');
         }
 
         // the GET_GENERIC_VIEWS scope is dormant
         // so it doesn't run
+        //
         // even though not defined as threaded
         // you can still call the scope later
         // even in the parent scope
@@ -87,7 +89,7 @@ class IndexController extends Controller {
 }
 ```
 
-It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) is smart, dynamic, low-level, configurable with syntax threading. You might be able to even do some kind of scope caching. If the scope is decorated or defined as cacheable with a TTL then I guess you don't need to run it? Weird. PHP 2.0. :)
+It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) is smart, dynamic, low-level, configurable with syntax threading. You might be able to even do some kind of scope caching. If the scope is decorated or defined as cacheable with a TTL then I guess you don't need to run it? Weird. PHP 2.0. :) Example above.
 
 I will admit it's close to just being a type of function or class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it.
 
