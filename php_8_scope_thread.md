@@ -16,7 +16,7 @@ process.nextTick(() => {
 
 What if at the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable elements via new tokens `thread` and `scope`
 
-Allowing multiple types of tokens in `thread` like scope references, function calls, constants, variables, imported classes, and instantiated objects might facilitate some pretty dope C-level code coordination.
+For the sake of the minimum viable idea here I'll keep `thread` as basically an array. It could end up being an actual associative array, allowing multiple types of tokens in `thread` like scope references, functions, constants, variables, imported classes, and instantiated objects. It might facilitate some pretty dope C-level code coordination.
 
 ```php
 class IndexController extends Controller {
@@ -36,8 +36,8 @@ class IndexController extends Controller {
 
         }
 
-        // vanilla enters here as if it was an if (TRUE)
-        scope TRACK_GENERIC_VIEW {
+        // enters here as if it was an if (TRUE)
+        scope TRACK_GENERIC_VIEW : bool {
 
             // has access to $user variable somehow.......
             // dependency injection hell but oh so smooth
@@ -45,18 +45,30 @@ class IndexController extends Controller {
             $user->save();
 
             // either returns var from scope
-            // or does nothing and moves on
+            // (doesn't return `index`)
+            // this only applies if you import the scope
+            // and then execute it to a variable
+            // like this: `$view = TRACK_GENERIC_VIEW;`
+            return TRUE;
         }
 
+        // enters here as if it was an if (TRUE)
+        // even though there's no typed return or TTL
         scope TRACK_SPECIFIC_VIEW {
 
             $user->trackSpecificView('index');
             $user->save();
 
+            // or does not return anything
+            // this only applies if you import the scope
+            // and don't set it to a variable
+            // like this: `TRACK_SPECIFIC_VIEW;`
+            // and then exits naturally like a function
+            // past the next bracket
         }
 
-        // this gets cached, gets the hour with an hour TTL
-        static scope GET_CURRENT_HOUR : 3600 {
+        // this gets cached, gets the hour with a 3600 TTL
+        static scope GET_CURRENT_HOUR : int => 3600 {
 
             // returns the hour once per hour
             // weird
@@ -69,7 +81,7 @@ class IndexController extends Controller {
         // even though not defined as threaded
         // you can still call the scope later
         // even in the parent scope
-        dormant scope GET_GENERIC_VIEWS {
+        dormant scope GET_GENERIC_VIEWS : array {
 
             // returning GET_GENERIC_VIEWS yields var
             return [4, 5];
