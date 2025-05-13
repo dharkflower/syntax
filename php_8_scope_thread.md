@@ -1,6 +1,6 @@
-Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about some compiling potential here.
+Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential.
 
-Lots to talk about. Let us proceed. Node.js snippet that inspired this syntax idea:
+Node.js snippet that inspired this syntax idea:
 
 ```javascript
 // do some stuff
@@ -14,9 +14,23 @@ process.nextTick(() => {
 })
 ```
 
-What if at the start of the execution of a PHP function you could **prepare** the function for what it's about to execute by defining threadable elements via new tokens `thread` and `scope`
+What if at the start of a PHP function you could **prepare** it for what it's about to execute?
 
-For the sake of the minimum viable idea here I'll keep `thread` as basically an array. It could end up being an actual associative array, allowing multiple types of tokens in `thread` like scope references, functions, constants, variables, imported classes, and instantiated objects. It might facilitate some pretty dope C-level code coordination.
+New tokens: **`thread`, `scope`, and `produce`**
+
+### `thread` is currently an array.
+
+It could end up an associative array type syntax, allowing multiple types of tokens in it like scope references, something with `produce`, functions, constants, variables, imported classes, environment variables. It might facilitate some pretty dope C-level code coordination.
+
+### `produce` is just `return` but for `scope`
+
+To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
+
+The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`
+
+### `scope` sections out code
+
+It has optional produce types that follow the same syntax as return types, and a TTL that's double-arrow defined
 
 ```php
 class IndexController extends Controller {
@@ -32,68 +46,61 @@ class IndexController extends Controller {
 
             // neither of these need to block UX
             TRACK_GENERIC_VIEW,
-            TRACK_SPECIFIC_VIEW,
+            TRACK_INDEX_VIEW,
 
         }
 
         // enters here as if it was an if (TRUE)
         scope TRACK_GENERIC_VIEW : bool {
 
-            // has access to $user variable somehow.......
-            // dependency injection hell but oh so smooth
+            // $user injected dependency
+            // even if being imported elsewhere
             $user->trackGenericView();
             $user->save();
 
-            // either returns var from scope
-            // (doesn't return `index`)
-            // this only applies if you import the scope
-            // and then execute it to a variable
-            // like this: `$view = TRACK_GENERIC_VIEW;`
-            return TRUE;
-        }
+            // produces something
+            // like this: `$view = TRACK_GENERIC_VIEW;
+
+            // producing doesn't return or break
+            produce TRUE;
+
+            // continues past curly brace...
+        } //// and continues on here...
 
         // enters here as if it was an if (TRUE)
-        // even though there's no typed return or TTL
-        scope TRACK_SPECIFIC_VIEW {
+        scope TRACK_INDEX_VIEW {
 
-            $user->trackSpecificView('index');
+            // same here
+            $user->trackIndexView();
             $user->save();
 
-            // or does not return anything
-            // this only applies if you import the scope
-            // and don't set it to a variable
-            // like this: `TRACK_SPECIFIC_VIEW;`
-            // and then exits naturally like a function
-            // past the next bracket
+            // does not produce anything
+            // like this: `TRACK_INDEX_VIEW;`
+
+            // continues past curly brace...
+        } //// and continues on here...
+
+        // the next scopes are static
+        // they get defined but not entered
+        // can be imported and used elsewhere
+        // produces hour int with a 3600 TTL
+        static scope GET_CURRENT_HOUR => 3600 : int {
+
+            // once per hour
+            produce date('h');
         }
 
-        // this gets cached, gets the hour with a 3600 TTL
-        static scope GET_CURRENT_HOUR : int => 3600 {
+        static scope GET_GENERIC_VIEWS : array {
 
-            // returns the hour once per hour
-            // weird
-            return date('h');
+            produce [4, 5];
         }
 
-        // the GET_GENERIC_VIEWS scope is dormant
-        // so it doesn't run
-        //
-        // even though not defined as threaded
-        // you can still call the scope later
-        // even in the parent scope
-        dormant scope GET_GENERIC_VIEWS : array {
+        static scope FETCH_DATA {
 
-            // returning GET_GENERIC_VIEWS yields var
-            return [4, 5];
+            produce [3];
         }
 
-        dormant scope FETCH_DATA {
-
-            // returning FETCH_DATA yields a var
-            return [3];
-        }
-
-        // FETCH_DATA scope yields data
+        // FETCH_DATA scope produces data
         return $this->render('index', [
             'data' => FETCH_DATA,
         ]);
@@ -101,52 +108,33 @@ class IndexController extends Controller {
 }
 ```
 
-It's a little meta to have another granularity of stuff that you can import, fair. But the main point of scopes (I think) is smart, dynamic, low-level, configurable with syntax threading. You might be able to even do some kind of scope caching. If the scope is decorated or defined as cacheable with a TTL then I guess you don't need to run it? Weird. PHP 2.0. :) Example above.
+It's meta to have another granularity: fair. But the point of these new tokens are performance. They enable smart, dynamic, low-level threading, code reusability, caching, all kinds of weird stuff here.
 
-I will admit it's close to just being a type of function or class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge at the sight of something so fresh; I'd bet on it.
+I'm going to think more about how we could implement some ways to check a scope's available variables and if it's using variables as parameters be able to hash them and look up if certain functions don't have to be ran. Beef up the TTL.
 
-Full snippet, here's a fully namespaced PHP class with some scope and class imports:
+I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it.
+
+Full snippet.
 
 ```php
 <?php
 
 namespace App\Controller;
 
-// core imports
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+// pull in the parent scope, enables short qualifier
+scope ::: App\Controller\IndexController\index;
 
-// pull in the class that has the methods with scopes
-// different than `use` so a few different options here
-// some of it pulling some concepts from Symfony routing
-scope App\Controller\IndexController;
+// uses short qualifier
+scope index ::: TRACK_GENERIC_VIEW;
+scope index ::: GET_GENERIC_VIEWS;
 
-// short qualifier
-// with the extra granularity qualifier `index`
-scope IndexController\index => TRACK_GENERIC_VIEW;
-scope IndexController\index => GET_GENERIC_VIEWS;
-
-// or list style
-scope IndexController ::: index {
-
+// list format, kind of cool
+scope index ::: {
+    
     TRACK_GENERIC_VIEW,
     GET_GENERIC_VIEWS,
 
-}
-
-// or list style other
-scope IndexController ::: {
-
-    index {
-
-        TRACK_GENERIC_VIEW,
-        GET_GENERIC_VIEWS,
-
-    }
-
-}
+};
 
 class AnalyticsController extends AbstractController {
 
@@ -157,20 +145,21 @@ class AnalyticsController extends AbstractController {
 
     ) : Response {
 
-        // an example of wanting to use a scope synchronously and asynchronously in different places
-        // in the IndexController, TRACK_GENERIC_VIEW didn't need to block for the UX
-        // in the AnalyticsController, TRACK_GENERIC_VIEW needs to block
-        // two different usages of code in two places in two different ways
-        // to drop-in use a scope synchronously
-        // I forget what those >>> blocks are called
-        // they bother me so cross functionality syntax
-        // important: synchronous here
+        // an example of synchronous and asynchronous
+        // in the IndexController,
+        // TRACK_GENERIC_VIEW didn't need to block
+        // in the AnalyticsController,
+        // TRACK_GENERIC_VIEW needs to block
+        // two different usages of code in two places
+        // drop-in use a scope synchronously
+        // because no thread {} block is defined
         TRACK_GENERIC_VIEW;
 
-        // now that the TRACK_GENERIC_VIEW scope has ran synchronously, you can pull a full report
+        // now that the TRACK_GENERIC_VIEW scope ran
+        // you can pull a full report
         // inject the full report into Twig
         return $this->render('analytics', [
-            'views' => GET_GENERIC_VIEWS
+            'views' => GET_GENERIC_VIEWS,
         ]);
     }
 }
