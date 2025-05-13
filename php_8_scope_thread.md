@@ -26,7 +26,7 @@ It could end up an associative array type syntax, allowing multiple types of tok
 
 To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
 
-The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`
+The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` for readability. It **could** use the return token, but it's a different functionality; it's a micro-return for that scope. It gets passed over if not utilized to "return" into a variable.
 
 ### `scope` sections out code
 
@@ -45,15 +45,15 @@ class IndexController extends Controller {
         thread {
 
             // neither of these need to block UX
-            TRACK_GENERIC_VIEW,
-            TRACK_INDEX_VIEW,
+            TRACK_GENERIC_VIEW // no commas
+            TRACK_INDEX_VIEW // no commas
 
         }
 
         // enters here as if it was an if (TRUE)
         scope TRACK_GENERIC_VIEW : bool {
 
-            // $user injected dependency
+            // $user injected dependency available
             // even if being imported elsewhere
             $user->trackGenericView();
             $user->save();
@@ -64,8 +64,8 @@ class IndexController extends Controller {
             // producing doesn't return or break
             produce TRUE;
 
-            // continues past curly brace...
-        } //// and continues on here...
+            // continues past produce...
+        } //// and continues past curly brace...
 
         // enters here as if it was an if (TRUE)
         scope TRACK_INDEX_VIEW {
@@ -77,8 +77,8 @@ class IndexController extends Controller {
             // does not produce anything
             // like this: `TRACK_INDEX_VIEW;`
 
-            // continues past curly brace...
-        } //// and continues on here...
+            // continues...
+        } //// and continues past curly brace...
 
         // the next scopes are static
         // they get defined but not entered
@@ -131,8 +131,8 @@ scope index ::: GET_GENERIC_VIEWS;
 // list format, kind of cool
 scope index ::: {
     
-    TRACK_GENERIC_VIEW,
-    GET_GENERIC_VIEWS,
+    TRACK_GENERIC_VIEW // , no commas, there's no point
+    GET_GENERIC_VIEWS // , think more vertical
 
 };
 
