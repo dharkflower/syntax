@@ -26,7 +26,7 @@ It could end up an associative array type syntax, allowing multiple types of tok
 
 To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
 
-The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` for readability. It **could** use the return token, but it's a different functionality; it's a micro-return for that scope. It gets passed over if not utilized to "return" into a variable.
+The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` for readability. It's a micro-return for that scope. It gets passed over if not utilized to execute into a variable.
 
 ### `scope` sections out code
 
