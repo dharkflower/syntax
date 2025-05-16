@@ -18,19 +18,23 @@ What if at the start of a PHP function you could **prepare** it for what it's ab
 
 New tokens: **`thread`, `scope`, and `produce`**
 
-### `thread` is an array of scopes
+### `thread` is an array
 
-If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like scope references, something with `produce`, functions, statics, constants, variables, imported classes, environment variables, it might especially facilitate some pretty dope C-level code coordination and wise TTL.
+`thread` is just an array of scopes to thread.
+
+If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially facilitate some pretty dope C-level code coordination.
 
 ### `produce` is just `return` but for `scope`
 
 To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
 
-The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`, `produce` is ignored if it doesn't stdout into something. It closes the scope but not the parent function.
+The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`, `produce` is ignored if it doesn't stdout into something.
 
 ### `scope` sections out code
 
-`scope` has optional produce types that follow the same syntax as return types, and a default TTL syntax that's double-arrowed.
+The point of scopes is to section out either a block you want threaded, a block you want TTL'd, or a block you want imported elsewhere.
+
+`scope` has optional produce types that follow the same syntax as return types that could be helpful in code coordination, as well as a default TTL syntax that's double-arrowed.
 
 ```php
 class IndexController extends Controller {
@@ -79,7 +83,7 @@ class IndexController extends Controller {
         } //// and continues past curly brace...
 
         // produces random number that lives for one hour
-        // dormant importable elsewhere but skipped
+        // dormant but importable elsewhere
         dormant scope GET_RANDOM_NUMBER => 3600 : int {
 
             produce rand(1, 10);
@@ -103,7 +107,7 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity, fair, but the point of these new tokens are performance. They enable smart, dynamic, low-level threading, code reusability, caching, all kinds of weird stuff here.
+It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, caching, all kinds of weird stuff. They do have a point.
 
 I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it.
 
@@ -122,18 +126,34 @@ scope App\Controller\IndexController\index ::: {
 
 };
 
+// multiple format idea, my vote also
+scope App\Controller\IndexController ::: {
+
+    index ::: {
+
+        TRACK_GENERIC_VIEW
+        GET_GENERIC_VIEWS
+
+    }
+
+    other ::: {
+        
+       // ...
+
+    }
+
+};
+
 // or pull in the scope's short qualifier
 scope App\Controller\IndexController\index;
 
 // and use it later
 scope index ::: TRACK_GENERIC_VIEW;
-scope index ::: GET_GENERIC_VIEWS;
 
 // singular format with short qualifier
 scope index ::: {
     
     TRACK_GENERIC_VIEW
-    GET_GENERIC_VIEWS
 
 };
 
@@ -158,7 +178,7 @@ class AnalyticsController extends AbstractController {
 
         // now that the TRACK_GENERIC_VIEW scope ran
         // you can get the generic views
-        // inject the full report into Twig
+        // inject the full views count into Twig
         return $this->render('analytics', [
             'views' => GET_GENERIC_VIEWS,
         ]);
