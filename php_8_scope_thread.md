@@ -118,6 +118,9 @@ Full snippet.
 
 namespace App\Controller;
 
+// use statements
+// ...
+
 // singular format idea, my vote
 scope App\Controller\IndexController\index ::: {
 
@@ -181,6 +184,58 @@ class AnalyticsController extends AbstractController {
         // inject the full views count into Twig
         return $this->render('analytics', [
             'views' => GET_GENERIC_VIEWS,
+        ]);
+    }
+}
+```
+
+Here are some more radical examples with a few other tokens to get you thinking:
+
+```php
+<?php
+
+namespace App\Controller;
+
+class PhpInfoController extends AbstractController {
+
+    #[Route('/phpinfo', name: 'request')]
+    public function phpinfo (
+
+        Request $request,
+        User $user
+
+    ) : Response {
+
+        // additional function curly brace block
+        // that accomplishes the same thing as `thread`
+        TRACK_GENERIC_VIEW
+    
+    } {
+
+        scope TRACK_GENERIC_VIEW : bool {
+
+            $user->trackGenericView();
+            $user->save();
+
+            produce TRUE;
+        }
+
+        async scope TRACK_INFO_VIEW : bool {
+
+        }
+
+        scope TRACK_INFO_VIEW ($parameter) : bool {
+
+        }
+
+        scope TRACK_INFO_VIEW use ($user) : bool {
+
+        }
+
+        return $this->render('phpinfo', [
+
+            'info' => phpinfo()
+
         ]);
     }
 }
