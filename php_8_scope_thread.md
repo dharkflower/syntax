@@ -18,19 +18,19 @@ What if at the start of a PHP function you could **prepare** it for what it's ab
 
 New tokens: **`thread`, `scope`, and `produce`**
 
-### `thread` is currently an array.
+### `thread` is an array of scopes
 
-It could end up an associative array type syntax, allowing multiple types of tokens in it like scope references, something with `produce`, functions, constants, variables, imported classes, environment variables. It might facilitate some pretty dope C-level code coordination.
+If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like scope references, something with `produce`, functions, statics, constants, variables, imported classes, environment variables, it might especially facilitate some pretty dope C-level code coordination and wise TTL.
 
 ### `produce` is just `return` but for `scope`
 
 To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
 
-The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` for readability. It's a micro-return for that scope. It gets passed over if not utilized to execute into a variable.
+The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`, `produce` is ignored if it doesn't stdout into something. It closes the scope but not the parent function.
 
 ### `scope` sections out code
 
-It has optional produce types that follow the same syntax as return types, and a TTL that's double-arrow defined
+`scope` has optional produce types that follow the same syntax as return types, and a default TTL syntax that's double-arrowed.
 
 ```php
 class IndexController extends Controller {
@@ -45,8 +45,8 @@ class IndexController extends Controller {
         thread {
 
             // neither of these need to block UX
-            TRACK_GENERIC_VIEW // no commas
-            TRACK_INDEX_VIEW // no commas
+            TRACK_GENERIC_VIEW
+            TRACK_INDEX_VIEW
 
         }
 
@@ -59,9 +59,7 @@ class IndexController extends Controller {
             $user->save();
 
             // produces something
-            // like this: `$view = TRACK_GENERIC_VIEW;
-
-            // producing doesn't return or break
+            // call like this: `$view = TRACK_GENERIC_VIEW;
             produce TRUE;
 
             // continues past produce...
@@ -75,32 +73,29 @@ class IndexController extends Controller {
             $user->save();
 
             // does not produce anything
-            // like this: `TRACK_INDEX_VIEW;`
+            // call like this: `TRACK_INDEX_VIEW;`
 
             // continues...
         } //// and continues past curly brace...
 
-        // the next scopes are static
-        // they get defined but not entered
-        // can be imported and used elsewhere
-        // produces hour int with a 3600 TTL
-        static scope GET_CURRENT_HOUR => 3600 : int {
+        // produces random number that lives for one hour
+        // dormant importable elsewhere but skipped
+        dormant scope GET_RANDOM_NUMBER => 3600 : int {
 
-            // once per hour
-            produce date('h');
+            produce rand(1, 10);
         }
 
-        static scope GET_GENERIC_VIEWS : array {
+        dormant scope GET_GENERIC_VIEWS : array {
 
             produce [4, 5];
         }
 
-        static scope FETCH_DATA {
+        dormant scope FETCH_DATA {
 
             produce [3];
         }
 
-        // FETCH_DATA scope produces data
+        // FETCH_DATA dormant scope still yields data
         return $this->render('index', [
             'data' => FETCH_DATA,
         ]);
@@ -108,9 +103,7 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity: fair. But the point of these new tokens are performance. They enable smart, dynamic, low-level threading, code reusability, caching, all kinds of weird stuff here.
-
-I'm going to think more about how we could implement some ways to check a scope's available variables and if it's using variables as parameters be able to hash them and look up if certain functions don't have to be ran. Beef up the TTL.
+It's meta to have another granularity, fair, but the point of these new tokens are performance. They enable smart, dynamic, low-level threading, code reusability, caching, all kinds of weird stuff here.
 
 I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it.
 
@@ -121,18 +114,26 @@ Full snippet.
 
 namespace App\Controller;
 
-// pull in the parent scope, enables short qualifier
-scope ::: App\Controller\IndexController\index;
+// singular format idea, my vote
+scope App\Controller\IndexController\index ::: {
 
-// uses short qualifier
+    TRACK_GENERIC_VIEW
+    GET_GENERIC_VIEWS
+
+};
+
+// or pull in the scope's short qualifier
+scope App\Controller\IndexController\index;
+
+// and use it later
 scope index ::: TRACK_GENERIC_VIEW;
 scope index ::: GET_GENERIC_VIEWS;
 
-// list format, kind of cool
+// singular format with short qualifier
 scope index ::: {
     
-    TRACK_GENERIC_VIEW // , no commas, there's no point
-    GET_GENERIC_VIEWS // , think more vertical
+    TRACK_GENERIC_VIEW
+    GET_GENERIC_VIEWS
 
 };
 
@@ -156,7 +157,7 @@ class AnalyticsController extends AbstractController {
         TRACK_GENERIC_VIEW;
 
         // now that the TRACK_GENERIC_VIEW scope ran
-        // you can pull a full report
+        // you can get the generic views
         // inject the full report into Twig
         return $this->render('analytics', [
             'views' => GET_GENERIC_VIEWS,
