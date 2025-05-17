@@ -22,7 +22,7 @@ New tokens: **`thread`, `scope`, `produce`, `async`, `dormant`**
 
 `thread` is just an array of scopes to thread.
 
-If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially, precisely, efficiently facilitate some pretty dope C-level code coordination.
+If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially, precisely, efficiently facilitate some pretty dope C-level code coordination and sorting.
 
 ### `produce` is just `return` but for `scope`
 
@@ -70,7 +70,7 @@ class IndexController extends Controller {
         } //// and continues past curly brace...
 
         // enters here as if it was an if (TRUE)
-        scope TRACK_INDEX_VIEW {
+        scope TRACK_INDEX_VIEW : void {
 
             // same here
             $user->trackIndexView();
@@ -82,26 +82,16 @@ class IndexController extends Controller {
             // continues...
         } //// and continues past curly brace...
 
-        // produces random number that lives for one hour
-        // dormant but importable elsewhere
-        dormant scope HOURLY_NUMBER => 3600 : int {
-
-            produce rand(1, 10);
-        }
-
+        // dormant but importable/executable elsewhere
         dormant scope GET_GENERIC_VIEWS : array {
 
             produce [4, 5];
-        }
 
-        dormant scope FETCH_DATA {
+        } //// skips to here and continues
 
-            produce [3];
-        }
-
-        // FETCH_DATA dormant scope still yields data
-        return $this->render('index', [
-            'data' => FETCH_DATA,
+        // GET_GENERIC_VIEWS still produces
+        return $this->render('views', [
+            'views' => GET_GENERIC_VIEWS,
         ]);
     }
 }
@@ -109,7 +99,7 @@ class IndexController extends Controller {
 
 It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, caching, all kinds of weird stuff. They do have a point.
 
-I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in.
+I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in.
 
 Full snippet.
 
@@ -221,12 +211,11 @@ class PhpInfoController extends AbstractController {
         }
 
         // async token
-        // maybe a deeper hook into Symfony Messenger-like
-        async scope DISPATCH_MESSAGE : TestMessage {
+        // reversely deeper Symfony Messenger-like hook
+        async scope DISPATCH_MESSAGE : StatusCode {
 
-            $message = new TestMessage();
-            $bus->dispatch($message);
-            produce $message;
+            $this->logger('phpinfo', phpinfo());
+            produce 200;
 
         }
 
