@@ -1,6 +1,8 @@
+### light reading
+
 check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential
 
-read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to think about potential ways to use it here
+read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to brainstorm some potential ways to adapt TTL's and stuff
 
 ### heredoc
 
@@ -22,7 +24,7 @@ new tokens: **`thread`, `scope`, `produce`, `dead`**
 
 `thread` is an array of scopes that has to be defined at the start of a function
 
-but if `thread` was upgraded to an associative array, however, it could become insanely helpful to kind of take control of some low level stuff with minimal syntax
+if `thread` was upgraded to an associative array it could become insanely helpful to kind of take control of some low level stuff with minimal syntax
 
 oh and uh if it allowed multiple tokens in it like TTL's, something with `yield`, functions, statics, constants, variables, use class imports, environment variables, hell shell commands... PHP might be able to more efficiently analyze and coordinate using some pretty dope C-level code
 
@@ -40,24 +42,25 @@ function sendMessage () : bool {
     }
 
     $sent = SEND;
-
     return $sent;
 
 }
+
+$messageSent = sendMessage();
 ```
 
-the only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` because they would hypothetically both be used in pretty tight unison
+the only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` because they would hypothetically be used in pretty tight unison
 
 `produce` is ignored if it doesn't stdout into something
 
-it most definitely does not exit out of the next generation up function
+it most definitely does not exit out of the next generation up function, just the scope it's in
 
 produce is a little limited here because of nesting, I'll circle back on this but this is my best idea for nesting so far:
 
 ```php
 <?php
 
-scope MASTER : string | bool {
+scope MAIN : string | bool {
 
     scope GET : int {
 
@@ -97,7 +100,7 @@ scope MASTER : string | bool {
     }
 }
 
-MASTER;
+MAIN;
 ```
 
 ### `scope` sections out code
@@ -106,7 +109,9 @@ the point of scopes is to section out a block you want either threaded, TTL'd, o
 
 `scope` has optional "produce types" that follow the same syntax as return types that could be helpful, as well as a default TTL syntax that's double-arrowed
 
-`dead` skips the scope for now because it will have been dead before it ever even started, to be alive - the block of code
+### `dead` skips the scope for now
+
+because it will have been dead before it ever even started, to be alive - the block of code
 
 ```php
 class IndexController extends Controller {
@@ -147,7 +152,7 @@ class IndexController extends Controller {
             $user->trackIndexView();
             $user->save();
 
-            // does not produce
+            // does not produce, hence void
             // ...
 
             // continues...
@@ -186,9 +191,9 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, TTL caching, all kinds of weird stuff. They do have a point.
+It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, TTL caching, all kinds of weird stuff; they do have a point
 
-I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in.
+I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
 
 Full snippet.
 
@@ -280,7 +285,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical concepts that are actually pretty clean, honestly
+here's some more radical concepts that I think are actually pretty clean, honestly; they're pretty huge 
 
 ```php
 <?php
