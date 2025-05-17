@@ -190,6 +190,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
+here's some more radical formatting ideas for this same thing
 
 ```php
 <?php
@@ -201,7 +202,6 @@ class PhpInfoController extends AbstractController {
     #[Route('/phpinfo', name: 'request')]
     public function phpinfo (
 
-        Request $request,
         User $user
 
     ) : Response {
@@ -230,16 +230,17 @@ class PhpInfoController extends AbstractController {
 
         }
 
-        scope SELECTIVE_USE use ($user) : bool {
+        scope SELECTIVE use ($user) : bool {
 
         }
 
         // every time it runs, it tries
-        try scope HOURLY_NUMBER => 3600 : bool {
-
+        try scope HOURLY_NUMBER => 3600 : int {
 
 
         } catch (\Exception $e) {
+
+        } finally {
 
         }
 
