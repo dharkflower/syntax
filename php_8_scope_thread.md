@@ -8,11 +8,7 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 scope syntax is the same as heredoc. I don't want to change it because I simply don't like heredoc, period
 
-code UX tells me they suck
-
-i'm not going to change it because heredoc should be deprecated and this should take its place
-
-lots to think about
+code UX tells me they suck, I'm not going to change it
 
 ### tokens
 
@@ -26,7 +22,7 @@ new tokens: **`thread`, `scope`, `produce`, `dead`**
 
 if `thread` was upgraded to an associative array it could become insanely helpful to kind of take control of some low level stuff with minimal syntax
 
-oh and uh if it allowed multiple tokens in it like TTL's, something with `yield`, functions, statics, constants, variables, use class imports, environment variables, hell shell commands... PHP might be able to more efficiently analyze and coordinate using some pretty dope C-level code
+like oh and uh if it allowed multiple tokens in it like TTL's, something with `yield`, functions, statics, constants, variables, use class imports, environment variables, hell shell commands... PHP might be able to more efficiently analyze and coordinate using some pretty dope C-level code
 
 ### `produce` is just `return` but for `scope`
 
@@ -51,9 +47,9 @@ $messageSent = sendMessage();
 
 the only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` because they would hypothetically be used in pretty tight unison
 
-`produce` is ignored if it doesn't stdout into something
+`produce` is ignored if it doesn't stdout into something, but it does "close" the scope
 
-it most definitely does not exit out of the next generation up function, just the scope it's in
+it most definitely does not return from the parent function scope
 
 produce is a little limited here because of nesting, I'll circle back on this but this is my best idea for nesting so far:
 
@@ -62,26 +58,27 @@ produce is a little limited here because of nesting, I'll circle back on this bu
 
 scope MAIN : string | bool {
 
-    scope GET : int {
+    dead scope GET : string {
 
-        $i = 1 + 1;
-        produce $i;
+        $message = 'hello';
+        produce $message;
 
     }
 
-    scope CHECK : bool {
+    dead scope CHECK : bool {
 
-        // you would need to pass in a parameter to get $i
+        // you would need to pass in a parameter
+        // to get access to $message
         // still thinking about parameters, hmm...
-        if ($i !== 2) {
+        if ($message !== 'hello') {
             
             // check fails
-            // wants to exit MASTER so produce 2
+            // wants to exit MASTER so produce 2 up
             produce 2 FALSE;
         }
 
         // check passes
-        // wants to exit CHECK, so produce inferred 1
+        // wants to exit CHECK, so produce inferred 1 up
         produce TRUE;
     }
 
@@ -99,8 +96,6 @@ scope MAIN : string | bool {
 
     }
 }
-
-MAIN;
 ```
 
 ### `scope` sections out code
@@ -139,7 +134,7 @@ class IndexController extends Controller {
             $user->trackGenericView();
             $user->save();
 
-            // produces bool
+            // produces bool, ignored if not captured
             produce TRUE;
 
             // continues...
@@ -285,7 +280,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean, honestly; they're pretty huge 
+here's some more radical concepts that I think are actually pretty clean, honestly
 
 ```php
 <?php
@@ -302,8 +297,10 @@ class PhpInfoController extends AbstractController {
 
     ) : Response {
 
-        // additional curly brace block
-        // that accomplishes the same thing as `thread`
+        // additional optional curly brace block
+        // that's just the thread array
+        // that accomplishes the same thing smoothly
+
         TRACK_GENERIC_VIEW
         DISPATCH_MESSAGE
     
@@ -323,7 +320,7 @@ class PhpInfoController extends AbstractController {
 
         // DISPATCH_MESSAGE is marked to thread
         // so when it gets here it forks
-        scope DISPATCH_MESSAGE : StatusCode {
+        scope DISPATCH_MESSAGE : int {
 
             $this->logger('message', 'sending message');
             produce 200;
