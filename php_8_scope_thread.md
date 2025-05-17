@@ -1,5 +1,7 @@
 Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential.
 
+Read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to think about how it could be used in conjunction with this.
+
 Node.js snippet that inspired this syntax idea:
 
 ```javascript
@@ -16,7 +18,7 @@ process.nextTick(() => {
 
 What if at the start of a PHP function you could **prepare** it for what it's about to execute?
 
-New tokens: **`thread`, `scope`, `produce`, `async`, `dormant`**
+New tokens: **`thread`, `scope`, `produce`, `dormant`**
 
 ### `thread` is an array
 
@@ -35,6 +37,8 @@ The only point of `produce` is to have a clear syntax distinction between `retur
 The point of scopes is to section out either a block you want threaded, a block you want TTL'd, or a block you want imported elsewhere.
 
 `scope` has optional produce types that follow the same syntax as return types that could be helpful in code coordination, as well as a default TTL syntax that's double-arrowed.
+
+`dormant` flags to skip that block for now
 
 ```php
 class IndexController extends Controller {
@@ -66,13 +70,13 @@ class IndexController extends Controller {
             // call like this: `$view = TRACK_GENERIC_VIEW;
             produce TRUE;
 
-            // continues past produce...
+            // but continues past produce...
         } //// and continues past curly brace...
 
         // enters here as if it was an if (TRUE)
         scope TRACK_INDEX_VIEW : void {
 
-            // same here
+            // ...
             $user->trackIndexView();
             $user->save();
 
@@ -80,24 +84,41 @@ class IndexController extends Controller {
             // call like this: `TRACK_INDEX_VIEW;`
 
             // continues...
-        } //// and continues past curly brace...
+        } //// continues past curly brace...
 
         // dormant but importable/executable elsewhere
+        // does not enter here as if it was an if (FALSE)
         dormant scope GET_GENERIC_VIEWS : array {
 
             produce [4, 5];
 
-        } //// skips to here and continues
+        } //// continues past curly brace...
 
-        // GET_GENERIC_VIEWS still produces
+        // GET_GENERIC_VIEWS still produces, still can
         return $this->render('views', [
             'views' => GET_GENERIC_VIEWS,
         ]);
     }
+
+    #[Route('/other', name: 'other')]
+    public function other (
+
+        User $user
+
+    ) : Response {
+
+        dormant scope COIN_FLIP => 7200 : bool {
+
+             // flips coin every two hours
+             produce (bool) rand(0, 1);
+        }
+
+        return $this->render('other');
+    }
 }
 ```
 
-It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, caching, all kinds of weird stuff. They do have a point.
+It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, TTL caching, all kinds of weird stuff. They do have a point.
 
 I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in.
 
@@ -108,9 +129,6 @@ Full snippet.
 
 namespace App\Controller;
 
-// use statements
-// ...
-
 // singular format idea, my vote
 scope App\Controller\IndexController\index ::: {
 
@@ -118,6 +136,13 @@ scope App\Controller\IndexController\index ::: {
     GET_GENERIC_VIEWS
 
 };
+
+// one for each method, pretty clean but functional
+scope App\Controller\IndexController\other ::: {
+
+    COIN_FLIP => 10800
+
+}
 
 // multiple format idea, my vote also
 scope App\Controller\IndexController ::: {
@@ -131,24 +156,30 @@ scope App\Controller\IndexController ::: {
 
     other ::: {
         
-       // ...
+        COIN_FLIP => 10800 // they only coin flip sometimes
 
     }
 
 };
 
-// or pull in the scope's short qualifier
-scope App\Controller\IndexController\index;
+// so maybe be able to pull in multiple qualifiers
+scope AppController\IndexController ::: {
 
-// and use it later
-scope index ::: TRACK_GENERIC_VIEW;
+    index
+    other
 
-// singular format with short qualifier
-scope index ::: {
-    
-    TRACK_GENERIC_VIEW
+}
 
-};
+// and use them later like this
+scope other ::: COIN_FLIP => 10800;
+
+// or expanded, by qualifier, like this
+scope other ::: {
+
+    COIN_FLIP => 10800
+
+}
+
 
 class AnalyticsController extends AbstractController {
 
@@ -196,25 +227,27 @@ class PhpInfoController extends AbstractController {
 
     ) : Response {
 
-        // additional function curly brace block
+        // additional curly brace block
         // that accomplishes the same thing as `thread`
         TRACK_GENERIC_VIEW
     
     } {
 
+        // it's marked to thread
+        // so when it gets here it forks
         scope TRACK_GENERIC_VIEW : bool {
 
             $user->trackGenericView();
             $user->save();
 
             produce TRUE;
-        }
 
-        // async token
-        // reversely deeper Symfony Messenger-like hook
-        async scope DISPATCH_MESSAGE : StatusCode {
+        } // post-fork
 
-            $this->logger('phpinfo', phpinfo());
+        // lots to talk about
+        scope DISPATCH_MESSAGE : StatusCode {
+
+            $this->logger('message', 'testing message');
             produce 200;
 
         }
@@ -230,6 +263,8 @@ class PhpInfoController extends AbstractController {
         // every time it runs, it tries
         try scope HOURLY_NUMBER => 3600 : int {
 
+            $num = rand(1, 10);
+            produce $num;
 
         } catch (\Exception $e) {
 
