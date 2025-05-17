@@ -224,6 +224,7 @@ class PhpInfoController extends AbstractController {
     #[Route('/phpinfo', name: 'request')]
     public function phpinfo (
 
+        Request $request,
         User $user
 
     ) : Response {
@@ -231,6 +232,7 @@ class PhpInfoController extends AbstractController {
         // additional curly brace block
         // that accomplishes the same thing as `thread`
         TRACK_GENERIC_VIEW
+        DISPATCH_MESSAGE
     
     } {
 
@@ -246,13 +248,16 @@ class PhpInfoController extends AbstractController {
         } //// continues post-fork past curly brace...
         ////// forgets about it
 
-        // lots to talk about, Symfony Messenger
+        // lots to talk about, Symfony Messenger + Redis
+        // but it's marked to thread
+        // so when it gets here it forks
         scope DISPATCH_MESSAGE : StatusCode {
 
             $this->logger('message', 'sending message');
             produce 200;
 
-        }
+        } //// continues post-fork past curly brace...
+        ////// forgets about it
 
         scope FAUX_FUNCTION ($parameter) : void {
 
