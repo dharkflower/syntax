@@ -226,7 +226,7 @@ class PhpInfoController extends AbstractController {
 
             $message = new TestMessage();
             $bus->dispatch($message);
-            return $message;
+            produce $message;
 
         }
 
