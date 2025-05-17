@@ -18,7 +18,7 @@ process.nextTick(() => {
 
 What if at the start of a PHP function you could **prepare** it for what it's about to execute?
 
-New tokens: **`thread`, `scope`, `produce`, `dead`**
+New tokens: **`thread`, `scope`, `produce`, `dead`, `**
 
 ### `thread` is an array
 
@@ -137,10 +137,12 @@ scope App\Controller\IndexController\index ::: {
 
 };
 
-// one for each method, pretty clean but functional
+// one for each method, pretty clean var but functional
+// set a custom TTL for coin flipping
+$ttl = 11000;
 scope App\Controller\IndexController\other ::: {
 
-    COIN_FLIP => 10800
+    COIN_FLIP => $ttl
 
 }
 
@@ -156,7 +158,7 @@ scope App\Controller\IndexController ::: {
 
     other ::: {
         
-        COIN_FLIP => 10800 // they only coin flip sometimes
+        COIN_FLIP => $ttl
 
     }
 
@@ -171,12 +173,12 @@ scope AppController\IndexController ::: {
 }
 
 // and use them later like this
-scope other ::: COIN_FLIP => 10800;
+scope other ::: COIN_FLIP => $ttl;
 
 // or expanded, by qualifier, like this
 scope other ::: {
 
-    COIN_FLIP => 10800
+    COIN_FLIP => $ttl
 
 }
 
@@ -201,7 +203,7 @@ class AnalyticsController extends AbstractController {
 
         // now that the TRACK_GENERIC_VIEW scope ran
         // you can get the generic views
-        // inject the full views count into Twig
+        // inject the full views query res into Twig
         return $this->render('analytics', [
             'views' => GET_GENERIC_VIEWS,
         ]);
@@ -244,7 +246,7 @@ class PhpInfoController extends AbstractController {
         } //// continues post-fork past curly brace...
         ////// forgets about it
 
-        // lots to talk about
+        // lots to talk about, Symfony Messenger
         scope DISPATCH_MESSAGE : StatusCode {
 
             $this->logger('message', 'sending message');
@@ -261,20 +263,14 @@ class PhpInfoController extends AbstractController {
         }
 
         // every time this runs, it tries
-        try dead scope HOURLY_NUMBER => 3600 : int {
+        try dead scope HOURLY_NUMBER => $ttl : int {
 
-            $num = rand(1, 10);
-            produce $num;
+            // random number each hour
+            produce rand(1, 10);
 
         } catch (\Exception $e) {
 
         } finally {
-
-        }
-
-        // incorporating a var like a for
-        $ttl = 3600;
-        dead scope HOURLY_NUMBER => $ttl : int {
 
         }
 
