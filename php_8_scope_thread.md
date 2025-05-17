@@ -1,44 +1,112 @@
-Check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential.
+check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential
 
-Read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to think about how it could be used in conjunction with this.
+read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to think about potential ways to use it here
 
-Node.js snippet that inspired this syntax idea:
+### heredoc
 
-```javascript
-// do some stuff
-import { createServer } from 'express'
-const port = 3000
+scope syntax is the same as heredoc. I don't want to change it because I simply don't like heredoc, period
 
-// do some stuff later with that stuff
-process.nextTick(() => {
-    const app = createServer(() => {})
-    app.listen(port)
-})
-```
+code UX tells me they suck
 
-What if at the start of a PHP function you could **prepare** it for what it's about to execute?
+i'm not going to change it because heredoc should be deprecated and this should take its place
 
-New tokens: **`thread`, `scope`, `produce`, `dead`, `**
+lots to think about
+
+### tokens
+
+what if at the start of a PHP function you could **prepare** it for what it's about to execute?
+
+new tokens: **`thread`, `scope`, `produce`, `dead`**
 
 ### `thread` is an array
 
-`thread` is just an array of scopes to thread.
+`thread` is an array of scopes that has to be defined at the start of a function
 
-If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially, precisely, efficiently facilitate some pretty dope C-level code coordination and sorting.
+but if `thread` was upgraded to an associative array, however, it could become insanely helpful to kind of take control of some low level stuff with minimal syntax
+
+oh and uh if it allowed multiple tokens in it like TTL's, something with `yield`, functions, statics, constants, variables, use class imports, environment variables, hell shell commands... PHP might be able to more efficiently analyze and coordinate using some pretty dope C-level code
 
 ### `produce` is just `return` but for `scope`
 
-To return/yield/execute a `scope` into a variable like `$view = TRACK_GENERIC_VIEW;` you use `produce`
+to produce a `scope` into a variable you call the scope kind of like a function, like this:
 
-The only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope`, `produce` is ignored if it doesn't stdout into something.
+```php
+<?php
+
+function sendMessage () : bool {
+
+    scope SEND {
+        produce TRUE;
+    }
+
+    $sent = SEND;
+
+    return $sent;
+
+}
+```
+
+the only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` because they would hypothetically both be used in pretty tight unison
+
+`produce` is ignored if it doesn't stdout into something
+
+it most definitely does not exit out of the next generation up function
+
+produce is a little limited here because of nesting, I'll circle back on this but this is my best idea for nesting so far:
+
+```php
+<?php
+
+scope MASTER : string | bool {
+
+    scope GET : int {
+
+        $i = 1 + 1;
+        produce $i;
+
+    }
+
+    scope CHECK : bool {
+
+        // you would need to pass in a parameter to get $i
+        // still thinking about parameters, hmm...
+        if ($i !== 2) {
+            
+            // check fails
+            // wants to exit MASTER so produce 2
+            produce 2 FALSE;
+        }
+
+        // check passes
+        // wants to exit CHECK, so produce inferred 1
+        produce TRUE;
+    }
+
+    $result = GET;
+
+    if (CHECK) {
+
+        produce 'passed check';
+
+    }
+
+    else {
+
+        produce 'did not pass check';
+
+    }
+}
+
+MASTER;
+```
 
 ### `scope` sections out code
 
-The point of scopes is to section out either a block you want threaded, a block you want TTL'd, or a block you want imported elsewhere.
+the point of scopes is to section out a block you want either threaded, TTL'd, or imported elsewhere
 
-`scope` has optional produce types that follow the same syntax as return types that could be helpful in code coordination, as well as a default TTL syntax that's double-arrowed.
+`scope` has optional "produce types" that follow the same syntax as return types that could be helpful, as well as a default TTL syntax that's double-arrowed
 
-`dead` flags to skip that block for now because it will have been dead before it ever even started, to be alive - the block of code
+`dead` skips the scope for now because it will have been dead before it ever even started, to be alive - the block of code
 
 ```php
 class IndexController extends Controller {
@@ -58,7 +126,7 @@ class IndexController extends Controller {
 
         }
 
-        // enters here as if it was an if (TRUE)
+        // enters here like it was an if (TRUE)
         scope TRACK_GENERIC_VIEW : bool {
 
             // $user injected dependency available
@@ -66,35 +134,35 @@ class IndexController extends Controller {
             $user->trackGenericView();
             $user->save();
 
-            // produces something
-            // call like this: `$view = TRACK_GENERIC_VIEW;
+            // produces bool
             produce TRUE;
 
-            // continues past produce...
+            // continues...
         } //// continues past curly brace...
 
-        // enters here as if it was an if (TRUE)
+        // enters here like it was an if (TRUE)
         scope TRACK_INDEX_VIEW : void {
 
             // ...
             $user->trackIndexView();
             $user->save();
 
-            // does not produce anything
-            // call like this: `TRACK_INDEX_VIEW;`
+            // does not produce
+            // ...
 
             // continues...
         } //// continues past curly brace...
 
-        // dead but importable/executable elsewhere
-        // does not enter here, as if it was an if (FALSE)
+        // dead but importable/executable scope elsewhere
+        // does not enter here, like it was an if (FALSE)
         dead scope GET_GENERIC_VIEWS : array {
 
             produce [4, 5];
 
+            // continues...
         } //// continues past curly brace...
 
-        // GET_GENERIC_VIEWS still produces, still can
+        // GET_GENERIC_VIEWS can still produce no worries
         return $this->render('views', [
             'views' => GET_GENERIC_VIEWS,
         ]);
@@ -236,7 +304,7 @@ class PhpInfoController extends AbstractController {
     
     } {
 
-        // it's marked to thread
+        // TRACK_GENERIC_VIEW is marked to thread
         // so when it gets here it forks
         scope TRACK_GENERIC_VIEW : bool {
 
@@ -248,8 +316,7 @@ class PhpInfoController extends AbstractController {
         } //// continues post-fork past curly brace...
         ////// forgets about it
 
-        // lots to talk about, Symfony Messenger + Redis
-        // but it's marked to thread
+        // DISPATCH_MESSAGE is marked to thread
         // so when it gets here it forks
         scope DISPATCH_MESSAGE : StatusCode {
 
@@ -258,14 +325,6 @@ class PhpInfoController extends AbstractController {
 
         } //// continues post-fork past curly brace...
         ////// forgets about it
-
-        scope FAUX_FUNCTION ($parameter) : void {
-
-        }
-
-        scope SELECTIVE use ($user) : bool {
-
-        }
 
         // every time this runs, it tries
         try dead scope HOURLY_NUMBER => $ttl : int {
@@ -286,4 +345,18 @@ class PhpInfoController extends AbstractController {
         ]);
     }
 }
+```
+
+### Node.js snippet that inspired this
+
+```javascript
+// do some stuff
+import { createServer } from 'express'
+const port = 3000
+
+// do some stuff later with that stuff
+process.nextTick(() => {
+    const app = createServer(() => {})
+    app.listen(port)
+})
 ```
