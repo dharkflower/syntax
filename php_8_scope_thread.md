@@ -22,7 +22,7 @@ New tokens: **`thread`, `scope`, `produce`, `async`, `dormant`**
 
 `thread` is just an array of scopes to thread.
 
-If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially facilitate some pretty dope C-level code coordination.
+If `thread` was upgraded to an associative array syntax, allowing multiple tokens in it like TTL integers, scope references, something with `produce` or `yield`, functions, statics, constants, variables, imported classes, environment variables, it might especially, precisely, efficiently facilitate some pretty dope C-level code coordination.
 
 ### `produce` is just `return` but for `scope`
 
@@ -109,7 +109,7 @@ class IndexController extends Controller {
 
 It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, caching, all kinds of weird stuff. They do have a point.
 
-I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it.
+I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in.
 
 Full snippet.
 
@@ -223,6 +223,10 @@ class PhpInfoController extends AbstractController {
         // async token
         // maybe a deeper hook into Symfony Messenger-like
         async scope DISPATCH_MESSAGE : TestMessage {
+
+            $message = new TestMessage();
+            $bus->dispatch($message);
+            return $message;
 
         }
 
