@@ -18,7 +18,7 @@ process.nextTick(() => {
 
 What if at the start of a PHP function you could **prepare** it for what it's about to execute?
 
-New tokens: **`thread`, `scope`, `produce`, `dormant`**
+New tokens: **`thread`, `scope`, `produce`, `dead`**
 
 ### `thread` is an array
 
@@ -38,7 +38,7 @@ The point of scopes is to section out either a block you want threaded, a block 
 
 `scope` has optional produce types that follow the same syntax as return types that could be helpful in code coordination, as well as a default TTL syntax that's double-arrowed.
 
-`dormant` flags to skip that block for now
+`dead` flags to skip that block for now because it will have been dead before it ever even started, to be alive - the block of code
 
 ```php
 class IndexController extends Controller {
@@ -70,8 +70,8 @@ class IndexController extends Controller {
             // call like this: `$view = TRACK_GENERIC_VIEW;
             produce TRUE;
 
-            // but continues past produce...
-        } //// and continues past curly brace...
+            // continues past produce...
+        } //// continues past curly brace...
 
         // enters here as if it was an if (TRUE)
         scope TRACK_INDEX_VIEW : void {
@@ -86,9 +86,9 @@ class IndexController extends Controller {
             // continues...
         } //// continues past curly brace...
 
-        // dormant but importable/executable elsewhere
-        // does not enter here as if it was an if (FALSE)
-        dormant scope GET_GENERIC_VIEWS : array {
+        // dead but importable/executable elsewhere
+        // does not enter here, as if it was an if (FALSE)
+        dead scope GET_GENERIC_VIEWS : array {
 
             produce [4, 5];
 
@@ -107,7 +107,7 @@ class IndexController extends Controller {
 
     ) : Response {
 
-        dormant scope COIN_FLIP => 7200 : bool {
+        dead scope COIN_FLIP => 7200 : bool {
 
              // flips coin every two hours
              produce (bool) rand(0, 1);
@@ -144,7 +144,7 @@ scope App\Controller\IndexController\other ::: {
 
 }
 
-// multiple format idea, my vote also
+// multiple format idea, my vote also, stronger
 scope App\Controller\IndexController ::: {
 
     index ::: {
@@ -180,7 +180,6 @@ scope other ::: {
 
 }
 
-
 class AnalyticsController extends AbstractController {
 
     #[Route('/analytics', name: 'analytics')]
@@ -211,7 +210,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical formatting ideas for this same thing
+here's some more radical concepts that are actually pretty clean, honestly
 
 ```php
 <?php
@@ -242,12 +241,13 @@ class PhpInfoController extends AbstractController {
 
             produce TRUE;
 
-        } // post-fork
+        } //// continues post-fork past curly brace...
+        ////// forgets about it
 
         // lots to talk about
         scope DISPATCH_MESSAGE : StatusCode {
 
-            $this->logger('message', 'testing message');
+            $this->logger('message', 'sending message');
             produce 200;
 
         }
@@ -260,8 +260,8 @@ class PhpInfoController extends AbstractController {
 
         }
 
-        // every time it runs, it tries
-        try scope HOURLY_NUMBER => 3600 : int {
+        // every time this runs, it tries
+        try dead scope HOURLY_NUMBER => 3600 : int {
 
             $num = rand(1, 10);
             produce $num;
@@ -269,6 +269,12 @@ class PhpInfoController extends AbstractController {
         } catch (\Exception $e) {
 
         } finally {
+
+        }
+
+        // incorporating a var like a for
+        $ttl = 3600;
+        dead scope HOURLY_NUMBER => $ttl : int {
 
         }
 
