@@ -16,7 +16,7 @@ process.nextTick(() => {
 
 What if at the start of a PHP function you could **prepare** it for what it's about to execute?
 
-New tokens: **`thread`, `scope`, and `produce`**
+New tokens: **`thread`, `scope`, `produce`, `async`, `dormant`**
 
 ### `thread` is an array
 
@@ -84,7 +84,7 @@ class IndexController extends Controller {
 
         // produces random number that lives for one hour
         // dormant but importable elsewhere
-        dormant scope GET_RANDOM_NUMBER => 3600 : int {
+        dormant scope HOURLY_NUMBER => 3600 : int {
 
             produce rand(1, 10);
         }
@@ -189,7 +189,7 @@ class AnalyticsController extends AbstractController {
 }
 ```
 
-Here are some more radical examples with a few other tokens to get you thinking:
+### brainium radicale
 
 ```php
 <?php
@@ -220,15 +220,26 @@ class PhpInfoController extends AbstractController {
             produce TRUE;
         }
 
-        async scope TRACK_INFO_VIEW : bool {
+        // async token
+        // maybe a deeper hook into Symfony Messenger-like
+        async scope DISPATCH_MESSAGE : TestMessage {
 
         }
 
-        scope TRACK_INFO_VIEW ($parameter) : bool {
+        scope FAUX_FUNCTION ($parameter) : void {
 
         }
 
-        scope TRACK_INFO_VIEW use ($user) : bool {
+        scope SELECTIVE_USE use ($user) : bool {
+
+        }
+
+        // every time it runs, it tries
+        try scope HOURLY_NUMBER => 3600 : bool {
+
+
+
+        } catch (\Exception $e) {
 
         }
 
