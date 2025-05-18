@@ -69,7 +69,7 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency I'm trying to decrease by forking overhead
+`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency, I'm trying to decrease forking overhead
 
 ```php
 class IndexController extends Controller {
@@ -125,7 +125,7 @@ class IndexController extends Controller {
     ) : Response {
 
         // gets cached for two hours
-        scope COIN_FLIP => 7200 : bool {
+        scope LAST_COIN => 7200 : bool {
 
              produce (bool) rand(0, 1);
 
@@ -157,7 +157,7 @@ scope App\Controller\IndexController\index ::: {
 $ttl = 11000;
 scope App\Controller\IndexController\coin ::: {
 
-    COIN_FLIP => $ttl
+    LAST_COIN => $ttl
 
 }
 
@@ -173,7 +173,7 @@ scope App\Controller\IndexController {
 
     coin ::: {
         
-        COIN_FLIP => $ttl
+        LAST_COIN => $ttl
 
     }
 
@@ -188,12 +188,12 @@ scope AppController\IndexController {
 }
 
 // and use them later like this
-scope coin ::: COIN_FLIP => $ttl;
+scope coin ::: LAST_COIN => $ttl;
 
 // or expanded out
 scope coin ::: {
 
-    COIN_FLIP => $ttl
+    LAST_COIN => $ttl
 
 }
 
@@ -228,7 +228,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize PHP threading quite a bit
+here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents but below the dependencies
 
 ```php
 <?php
@@ -306,7 +306,7 @@ class InfoController extends AbstractController {
 
 scope MAIN : string | bool {
 
-    scope GET : string {
+    scope MESSAGE : string {
 
         $message = 'hello';
         produce $message;
@@ -321,7 +321,7 @@ scope MAIN : string | bool {
         if ($message !== 'hello') {
             
             // check fails
-            // wants to exit MASTER so produce 2 up
+            // wants to exit MAIN so produce 2 up
             produce 2 FALSE;
         }
 
@@ -330,7 +330,7 @@ scope MAIN : string | bool {
         produce TRUE;
     }
 
-    $result = GET;
+    $message = MESSAGE;
 
     if (CHECK) {
 
@@ -345,7 +345,7 @@ scope MAIN : string | bool {
     }
 }
 
-$pass = MAIN;
+$output = MAIN;
 ```
 
 ### Node.js snippet that inspired this
