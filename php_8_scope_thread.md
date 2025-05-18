@@ -8,7 +8,7 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 ### `scope` and `produce`
 
-`scope` sections out blocks you want entered and ran, threaded, TTL'd, and/or imported elsewhere
+`scope` sections out blocks you want entered, ran, threaded, TTL'd, and/or imported elsewhere
 
 `produce` is just `return` but for `scope`, `produce` does close the current scope and "returns" a value from it but does not return from the parent function: `sendMessage`
 
@@ -136,7 +136,7 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity, fair
+it's meta to have another granularity, fair
 
 I will admit there's other ways to do this in PHP if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
 
@@ -228,7 +228,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents but below the dependencies
+here's some concepts that I think are pretty clean. I extremely like the curly brace thread block being above the function contents but below the injected dependencies
 
 ```php
 <?php
@@ -253,7 +253,7 @@ class InfoController extends AbstractController {
     } {
 
         // DISPATCH_MESSAGE flagged to enter and thread
-        // so when it enters here it forks
+        // so it enters here, forks, moves on
         enter scope DISPATCH_MESSAGE : int {
 
             $this->logger('message', 'sending message');
@@ -276,30 +276,27 @@ class InfoController extends AbstractController {
 
         }
 
-        // messing around with parameters
+        // facts
+        $info = [
+            'grass is green',
+            'sky is blue',
+        ];
+
+        // wraps in bold HTML
         scope BOLD (string $str) : string {
             
             produce "<b>$str</b";
 
         }
 
-        $info = [
-            'grass is green',
-            'sky is blue',
-        ];
-
-        // array_map on roids, just for indexed arrays
-        scope foreach ($info as BOLD);
-
-        // now...
-        // $info = [
-        //     '<b>grass is green</b>',
-        //     '<b>sky is blue</b>',
-        // ];
+        // strictly just for indexed arrays
+        // strictly $info is always auto a reference
+        // array_map on roids
+        scope BOLD ($info);
 
         return $this->render('info', [
 
-            'info' => $info
+            'info' => $info,
 
         ]);
     }
@@ -323,9 +320,8 @@ scope MAIN : string | bool {
 
     scope CHECK : bool {
 
-        // you would need to pass in a parameter
-        // to get access to $message
-        // still thinking about parameters, hmm...
+        // you would need...
+        // access to $message
         if ($message !== 'hello') {
             
             // check fails
