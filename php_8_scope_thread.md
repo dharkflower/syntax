@@ -6,6 +6,10 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 `scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***-thorn... thumb twiddle this is awkward and better
 
+### but constants
+
+maybe scopes could act like constants, unable to be redefined once defined, so that the namespacing doesn't clash
+
 ### `scope` and `produce`
 
 `scope` sections out blocks you want entered, ran, threaded, TTL'd, and/or imported elsewhere
