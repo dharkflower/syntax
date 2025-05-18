@@ -69,7 +69,7 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork defined at the beginning of a function. I have some ideas on how this could work using IPC/Apache2 to avoid latency but this is the idea on the PHP side:
+`thread` is an array of `scope` blocks to fork defined at the beginning of a function. It could be associative... hmm. I have some ideas on how this could work using IPC to avoid the latency I'm trying to decrease but this is the PHP side:
 
 ```php
 class IndexController extends Controller {
@@ -103,14 +103,15 @@ class IndexController extends Controller {
         }
 
         // no `enter` token
-        // defines but does not enter, like an if (FALSE)
+        // defines but does not enter
+        // like an if (FALSE)
         scope GET_NUMBERS : array {
 
             produce [4, 5];
 
         }
 
-        // GET_NUMBERS is defined, though; it can produce
+        // GET_NUMBERS is defined and can produce
         return $this->render('index', [
             'numbers' => GET_NUMBERS,
         ]);
@@ -124,7 +125,7 @@ class IndexController extends Controller {
     ) : Response {
 
         // gets cached for two hours
-        enter scope COIN_FLIP => 7200 : bool {
+        scope COIN_FLIP => 7200 : bool {
 
              produce (bool) rand(0, 1);
 
@@ -209,33 +210,33 @@ class AnalyticsController extends AbstractController {
         // INCREMENT didn't need to block
 
         // in AnalyticsController
-        // GET_NUMBERS needs to block
+        // INCREMENT needs to block GET_NUMBERS
 
         // no thread {} block is flagging it to fork
         // so the scope runs synchronously
         INCREMENT;
 
         // now that the INCREMENT scope ran
-        // you can get the numbers and Twig inject
+        // you can GET_NUMBERS and Twig inject
         return $this->render('analytics', [
-            'views' => GET_NUMBERS,
+            'numbers' => GET_NUMBERS,
         ]);
     }
 }
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean
+here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize and mainstream super low-level ZTS thread-safe approaches
 
 ```php
 <?php
 
 namespace App\Controller;
 
-class PhpInfoController extends AbstractController {
+class InfoController extends AbstractController {
 
-    #[Route('/phpinfo', name: 'phpinfo')]
-    public function phpinfo (
+    #[Route('/info', name: 'info')]
+    public function info (
 
         Request $request,
         User $user
@@ -274,9 +275,9 @@ class PhpInfoController extends AbstractController {
 
         }
 
-        return $this->render('phpinfo', [
+        return $this->render('info', [
 
-            'info' => phpinfo()
+            'info' => []
 
         ]);
     }
@@ -290,14 +291,14 @@ class PhpInfoController extends AbstractController {
 
 scope MAIN : string | bool {
 
-    dead scope GET : string {
+    scope GET : string {
 
         $message = 'hello';
         produce $message;
 
     }
 
-    dead scope CHECK : bool {
+    scope CHECK : bool {
 
         // you would need to pass in a parameter
         // to get access to $message
