@@ -37,12 +37,13 @@ function sendMessage () : string {
 
 }
 
-$status = sendMessage(); // 'ok'
+$status = sendMessage();
+echo $status; // 'ok'
 ```
 
 ### `enter`
 
-`enter` before `scope` flags the scope to be both entered/ran **and** defined/reused:
+`enter` before `scope` flags the scope to be entered, executed, and exited, not just defined/reused
 
 ```php
 <?php
@@ -59,7 +60,7 @@ function sendMessage () : void {
     $sendAgain = TRUE;
     if ($sendAgain) {
 
-        SEND; // SEND scope is reusable
+        SEND;
 
     }
 }
