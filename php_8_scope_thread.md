@@ -69,12 +69,12 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork defined at the beginning of a function. It could be associative... hmm. I have some ideas on how this could work using IPC to avoid the latency I'm trying to decrease but this is the PHP side:
+`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency I'm trying to decrease by forking
 
 ```php
 class IndexController extends Controller {
 
-    #[Route('/', name: 'index')]
+    #[Route('/index', name: 'index')]
     public function index (
 
         Incrementer $incrementer
@@ -88,8 +88,7 @@ class IndexController extends Controller {
 
         }
 
-        // `enter` token
-        // enters like an if (TRUE)
+        // enters like an if (TRUE), forked
         enter scope INCREMENT : bool {
 
             // injected dependency available
@@ -99,21 +98,22 @@ class IndexController extends Controller {
 
             // produces produce type "bool"
             // ignored if not captured
+            // like echo vs. print
             produce TRUE;
         }
 
-        // no `enter` token
-        // defines but does not enter
-        // like an if (FALSE)
-        scope GET_NUMBERS : array {
+        // does not enter, like an if (FALSE)
+        scope GET_NUMBER : int {
 
-            produce [4, 5];
+            produce $incrementer->getNumber();
 
         }
 
-        // GET_NUMBERS is defined and can produce
+        // but GET_NUMBER is defined, can produce
         return $this->render('index', [
-            'numbers' => GET_NUMBERS,
+
+            'number' => GET_NUMBER
+
         ]);
     }
 
@@ -136,9 +136,9 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity but.
+It's meta to have another granularity, fair.
 
-I will admit this is similar to utilization of threading classes if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
+I will admit there's other ways to do this in PHP if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
 
 ```php
 <?php
@@ -149,7 +149,7 @@ namespace App\Controller;
 scope App\Controller\IndexController\index ::: {
 
     INCREMENT
-    GET_NUMBERS
+    GET_NUMBER
 
 };
 
@@ -167,7 +167,7 @@ scope App\Controller\IndexController {
     index ::: {
 
         INCREMENT
-        GET_NUMBERS
+        GET_NUMBER
 
     }
 
@@ -210,23 +210,25 @@ class AnalyticsController extends AbstractController {
         // INCREMENT didn't need to block
 
         // in AnalyticsController
-        // INCREMENT needs to block GET_NUMBERS
+        // INCREMENT needs to block GET_NUMBER
 
-        // no thread {} block is flagging it to fork
-        // so the scope runs synchronously
+        // no thread {} block is flagging INCREMENT
+        // so INCREMENT runs blocked
         INCREMENT;
 
         // now that the INCREMENT scope ran
-        // you can GET_NUMBERS and Twig inject
+        // you can GET_NUMBER and Twig inject
         return $this->render('analytics', [
-            'numbers' => GET_NUMBERS,
+
+            'number' => GET_NUMBER
+
         ]);
     }
 }
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize and mainstream super low-level ZTS thread-safe approaches
+here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize PHP threading
 
 ```php
 <?php
@@ -251,7 +253,7 @@ class InfoController extends AbstractController {
     
     } {
 
-        // DISPATCH_MESSAGE is flagged to enter, thread
+        // DISPATCH_MESSAGE flagged to enter and thread
         // so when it gets here it forks
         enter scope DISPATCH_MESSAGE : int {
 
