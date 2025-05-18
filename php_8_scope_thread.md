@@ -136,7 +136,7 @@ class IndexController extends Controller {
 }
 ```
 
-It's meta to have another granularity, fair.
+It's meta to have another granularity, fair
 
 I will admit there's other ways to do this in PHP if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
 
@@ -261,10 +261,10 @@ class InfoController extends AbstractController {
 
         }
 
-        // programmatically generate a TTL based on need
+        // programmatically generate a TTL
         $ttl = 3600;
 
-        // every time this runs uncached, it "tries"
+        // every time this runs uncached, it try/catches
         try scope HOURLY_NUMBER => $ttl : int {
 
             // random number each hour
@@ -288,7 +288,14 @@ class InfoController extends AbstractController {
             'sky is blue',
         ];
 
-        $info = foreach ($info as $str => BOLD);
+        // array_map on roids, just for indexed arrays
+        scope foreach ($info as BOLD);
+
+        // now...
+        // $info = [
+        //     '<b>grass is green</b>',
+        //     '<b>sky is blue</b>',
+        // ];
 
         return $this->render('info', [
 
@@ -306,10 +313,11 @@ class InfoController extends AbstractController {
 
 scope MAIN : string | bool {
 
-    scope MESSAGE : string {
+    $message = NULL;
+
+    enter scope MESSAGE : string {
 
         $message = 'hello';
-        produce $message;
 
     }
 
@@ -330,8 +338,6 @@ scope MAIN : string | bool {
         produce TRUE;
     }
 
-    $message = MESSAGE;
-
     if (CHECK) {
 
         produce 'passed check';
@@ -345,7 +351,7 @@ scope MAIN : string | bool {
     }
 }
 
-$output = MAIN;
+$result = MAIN;
 ```
 
 ### Node.js snippet that inspired this
