@@ -110,7 +110,7 @@ class IndexController extends Controller {
 
         }
 
-        // but GET_NUMBER **is** defined, can produce
+        // but GET_NUMBER is defined and can produce
         return $this->render('index', [
 
             'number' => GET_NUMBER
