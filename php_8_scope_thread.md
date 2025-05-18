@@ -4,7 +4,7 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 ### heredocs suck
 
-`scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***thorn... thumb twiddle this is awkward and better
+`scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***-thorn... thumb twiddle this is awkward and better
 
 ### `scope` and `produce`
 
@@ -69,7 +69,7 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency I'm trying to decrease by forking
+`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency I'm trying to decrease by forking overhead
 
 ```php
 class IndexController extends Controller {
@@ -228,7 +228,7 @@ class AnalyticsController extends AbstractController {
 ```
 
 ### brainium radicale
-here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize PHP threading
+here's some more radical concepts that I think are actually pretty clean. I extremely like the thread block being above the function contents, it could normalize PHP threading quite a bit
 
 ```php
 <?php
@@ -240,8 +240,7 @@ class InfoController extends AbstractController {
     #[Route('/info', name: 'info')]
     public function info (
 
-        Request $request,
-        User $user
+        Request $request
 
     ) : Response {
 
@@ -254,7 +253,7 @@ class InfoController extends AbstractController {
     } {
 
         // DISPATCH_MESSAGE flagged to enter and thread
-        // so when it gets here it forks
+        // so when it enters here it forks
         enter scope DISPATCH_MESSAGE : int {
 
             $this->logger('message', 'sending message');
@@ -277,9 +276,23 @@ class InfoController extends AbstractController {
 
         }
 
+        // messing around with parameters
+        scope BOLD (string $str) : string {
+            
+            produce "<b>$str</b";
+
+        }
+
+        $info = [
+            'grass is green',
+            'sky is blue',
+        ];
+
+        $info = foreach ($info as $str => BOLD);
+
         return $this->render('info', [
 
-            'info' => []
+            'info' => $info
 
         ]);
     }
@@ -331,6 +344,8 @@ scope MAIN : string | bool {
 
     }
 }
+
+$pass = MAIN;
 ```
 
 ### Node.js snippet that inspired this
