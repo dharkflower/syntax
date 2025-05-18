@@ -83,9 +83,7 @@ class IndexController extends Controller {
 
         thread {
 
-            // scope doesn't need to block
-            // flagged to fork if ever ran in `index`
-            // whether by `enter` or invoking it
+            // flagged to fork when `index` runs
             INCREMENT
 
         }
