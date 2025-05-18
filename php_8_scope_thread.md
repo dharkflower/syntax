@@ -2,9 +2,9 @@
 
 read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) to brainstorm potential ways to `adapt` scopes
 
-### heredocs suck, and constants
+### heredocs suck
 
-`scope` syntax is similar to heredocs and constants accidentally but they are a PHP visual s***-thorn, thumb twiddle this is awkward and better
+`scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***-thorn, thumb twiddle this is awkward and better
 
 ### `scope` and `produce`
 
