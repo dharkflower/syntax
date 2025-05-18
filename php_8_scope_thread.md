@@ -126,9 +126,9 @@ class IndexController extends Controller {
     ) : Response {
 
         // gets cached for two hours
-        scope LAST_COIN => 7200 {
+        scope LAST_COIN => 7200 : bool {
 
-             produce (bool) rand(0, 1) ? 'heads' : 'tails';
+             produce (bool) rand(0, 1);
 
         }
 
