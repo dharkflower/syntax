@@ -1,3 +1,7 @@
+### clarity
+
+none of this exists, I just want it to
+
 ### light reading
 
 read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) to brainstorm potential ways to `adapt` scopes
@@ -8,11 +12,9 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 ### `scope` and `produce`
 
-`scope` sections out blocks you want entered, ran, threaded, TTL'd, and/or imported elsewhere
+`scope` sections out blocks you want executed, threaded, TTL'd, and/or imported elsewhere
 
-`produce` is just `return` but for `scope`, `produce` does close the current scope and "returns" a value from it but does not return from the parent function: `sendMessage`
-
-`scope` supports "produce types" like return types, C-level helpful for sure
+`produce` is just `return` but for `scope`, `produce` does close the current scope and "returns" a value from it but it does not return from the parent function: `sendMessage`
 
 ```php
 <?php
@@ -43,14 +45,14 @@ echo $status; // 'ok'
 
 ### `enter`
 
-`enter` before `scope` flags the scope to be entered, executed, and exited, not just defined/reused
+`enter` before `scope` flags the scope to be executed inline as it gets defined
 
 ```php
 <?php
 
 function sendMessage () : void {
 
-    // SEND scope is entered and ran
+    // SEND scope is executed/defined
     enter scope SEND {
 
         // sends something...
@@ -60,6 +62,7 @@ function sendMessage () : void {
     $sendAgain = TRUE;
     if ($sendAgain) {
 
+        // SEND scope is executed again
         SEND;
 
     }
@@ -70,7 +73,7 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork when they run that's defined at the beginning of a function. IPC might help to avoid latency, I'm trying to decrease forking overhead
+`thread` is an array of `scope` blocks to fork when they execute, the only super issue is forking overhead... hmm but I have some IPC ideas that might help
 
 ```php
 class IndexController extends Controller {
@@ -89,7 +92,7 @@ class IndexController extends Controller {
 
         }
 
-        // enters like an if (TRUE), forked
+        // executes like an if (TRUE), forked
         enter scope INCREMENT : bool {
 
             // injected dependency available
@@ -97,13 +100,13 @@ class IndexController extends Controller {
             // good luck, autoloader man
             $incrementer->increment();
 
-            // produces produce type "bool"
+            // scope produces type "bool"
             // ignored if not captured
             // like echo vs. print
             produce TRUE;
         }
 
-        // does not enter, like an if (FALSE)
+        // does not execute, like an if (FALSE)
         scope GET_NUMBER : int {
 
             produce $incrementer->getNumber();
@@ -146,7 +149,8 @@ I will admit there's other ways to do this in PHP if you admit that even Mr. Cle
 
 namespace App\Controller;
 
-// singular qualifier (index) format
+// singular qualifier (index)
+// class method to scope(s) token ":::"
 scope App\Controller\IndexController\index ::: {
 
     INCREMENT
@@ -154,15 +158,9 @@ scope App\Controller\IndexController\index ::: {
 
 };
 
-// set a custom TTL using a var
-$ttl = 11000;
-scope App\Controller\IndexController\coin ::: {
-
-    LAST_COIN => $ttl
-
-}
-
-// multiple qualifier (index, coin) format
+// single qualifier just up until the class
+// multiple method qualifiers (index, coin)
+// that then import scope sets
 scope App\Controller\IndexController {
 
     index ::: {
@@ -174,14 +172,14 @@ scope App\Controller\IndexController {
 
     coin ::: {
         
-        LAST_COIN => $ttl
+        LAST_COIN
 
     }
 
 };
 
-// maybe be able to pull in qualifiers
-scope AppController\IndexController {
+// maybe be able to pull in short qualifiers
+scope App\Controller\IndexController {
 
     index
     coin
@@ -189,19 +187,19 @@ scope AppController\IndexController {
 }
 
 // and use them later like this
-scope coin ::: LAST_COIN => $ttl;
+scope coin ::: LAST_COIN;
 
 // or expanded out
 scope coin ::: {
 
-    LAST_COIN => $ttl
+    LAST_COIN
 
 }
 
-class AnalyticsController extends AbstractController {
+class NumberController extends AbstractController {
 
-    #[Route('/analytics', name: 'analytics')]
-    public function analytics (
+    #[Route('/number', name: 'number')]
+    public function number (
 
         Request $request
 
@@ -210,7 +208,7 @@ class AnalyticsController extends AbstractController {
         // in IndexController
         // INCREMENT didn't need to block
 
-        // in AnalyticsController
+        // in NumberController
         // INCREMENT needs to block GET_NUMBER
 
         // no thread {} block is flagging INCREMENT
@@ -219,7 +217,7 @@ class AnalyticsController extends AbstractController {
 
         // now that the INCREMENT scope ran
         // you can GET_NUMBER and Twig inject
-        return $this->render('analytics', [
+        return $this->render('number', [
 
             'number' => GET_NUMBER
 
@@ -290,9 +288,13 @@ class InfoController extends AbstractController {
         }
 
         // or formatted like I want params to be
+        // in case of many many params
         scope ITALIC (
 
-            string $str
+            string $str,
+            int $integer,
+            float $float,
+            decimal $decimal
 
         ) : string {
             
