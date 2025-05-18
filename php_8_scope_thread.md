@@ -2,13 +2,9 @@
 
 read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) to brainstorm potential ways to `adapt` scopes
 
-### heredocs suck
+### heredocs suck, and constants
 
-`scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***-thorn... thumb twiddle this is awkward and better
-
-### but constants
-
-fair, I don't know what to say except for if this syntax could work I would straight up dig that
+`scope` syntax is similar to heredocs and constants accidentally but they are a PHP visual s***-thorn, thumb twiddle this is awkward and better
 
 ### `scope` and `produce`
 
@@ -73,7 +69,7 @@ sendMessage();
 
 ### `thread`
 
-`thread` is an array of `scope` blocks to fork that's defined at the beginning of a function. IPC maybe to avoid latency, I'm trying to decrease forking overhead
+`thread` is an array of `scope` blocks to fork when they run that's defined at the beginning of a function. IPC might help to avoid latency, I'm trying to decrease forking overhead
 
 ```php
 class IndexController extends Controller {
@@ -87,7 +83,7 @@ class IndexController extends Controller {
 
         thread {
 
-            // flagged to fork when `index` runs
+            // flagged to fork
             INCREMENT
 
         }
@@ -113,7 +109,7 @@ class IndexController extends Controller {
 
         }
 
-        // but GET_NUMBER is defined, can produce
+        // but GET_NUMBER **is** defined, can produce
         return $this->render('index', [
 
             'number' => GET_NUMBER
@@ -129,9 +125,9 @@ class IndexController extends Controller {
     ) : Response {
 
         // gets cached for two hours
-        scope LAST_COIN => 7200 : bool {
+        scope LAST_COIN => 7200 {
 
-             produce (bool) rand(0, 1);
+             produce (bool) rand(0, 1) ? 'heads' : 'tails';
 
         }
 
@@ -250,7 +246,7 @@ class InfoController extends AbstractController {
 
         // additional optional curly brace block
         // that's just the thread block but unnamed
-        // that accomplishes the same thing smoothly
+        // that accomplishes the same thing, smoothly
 
         DISPATCH_MESSAGE
     
@@ -271,7 +267,6 @@ class InfoController extends AbstractController {
         // every time this runs uncached, it try/catches
         try scope HOURLY_NUMBER => $ttl : int {
 
-            // random number each hour
             produce rand(1, 10);
 
         } catch (\Exception $e) {
@@ -286,15 +281,26 @@ class InfoController extends AbstractController {
             'sky is blue',
         ];
 
-        // wraps in bold HTML
+        // with $str scope param
         scope BOLD (string $str) : string {
             
-            produce "<b>$str</b";
+            produce "<b>$str</b>";
+
+        }
+
+        // or formatted like I want params to be
+        scope ITALIC (
+
+            string $str
+
+        ) : string {
+            
+            produce "<i>$str</i>";
 
         }
 
         // strictly just for indexed arrays
-        // strictly $info is always auto a reference
+        // $info is always a reference
         // array_map on roids
         scope BOLD ($info);
 
@@ -326,6 +332,7 @@ scope MAIN : string | bool {
 
         // you would need...
         // access to $message
+        // lots to think about
         if ($message !== 'hello') {
             
             // check fails
