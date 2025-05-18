@@ -1,57 +1,291 @@
 ### light reading
 
-check out [trace](https://github.com/dharkflower/syntax/blob/main/php_7_trace.md) if you want to read about compiling potential
+read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) to brainstorm potential ways to `adapt` scopes
 
-read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.md) if you want to brainstorm some potential ways to adapt TTL's and stuff
+### heredocs suck
 
-### heredoc
+`scope` syntax is similar to heredocs accidentally but heredocs are a PHP visual s***thorn... thumb twiddle this is awkward and better
 
-scope syntax is the same as heredoc. I don't want to change it because I simply don't like heredoc, period
+### `scope` and `produce`
 
-code UX tells me they suck, I'm not going to change it
+`scope` sections out blocks you want entered and ran, threaded, TTL'd, and/or imported elsewhere
 
-### tokens
+`produce` is just `return` but for `scope`, `produce` does close the current scope and "returns" a value from it but does not return from the parent function: `sendMessage`
 
-what if at the start of a PHP function you could **prepare** it for what it's about to execute?
-
-new tokens: **`thread`, `scope`, `produce`, `dead`**
-
-### `thread` is an array
-
-`thread` is an array of scopes that has to be defined at the start of a function
-
-if `thread` was upgraded to an associative array it could become insanely helpful to kind of take control of some low level stuff with minimal syntax
-
-like oh and uh if it allowed multiple tokens in it like TTL's, something with `yield`, functions, statics, constants, variables, use class imports, environment variables, hell shell commands... PHP might be able to more efficiently analyze and coordinate using some pretty dope C-level code
-
-### `produce` is just `return` but for `scope`
-
-to produce a `scope` into a variable you call the scope kind of like a function, like this:
+`scope` supports "produce types" like return types, C-level helpful for sure
 
 ```php
 <?php
 
-function sendMessage () : bool {
+function sendMessage () : string {
 
-    scope SEND {
-        produce TRUE;
+    scope SEND : bool {
+
+        produce TRUE; // closes SEND
+
     }
 
-    $sent = SEND;
-    return $sent;
+    $result = SEND; // TRUE
+
+    if ($result) {
+
+        return 'ok'; // closes sendMessage
+
+    }
+
+    return 'not ok'; // closes sendMessage
 
 }
 
-$messageSent = sendMessage();
+$status = sendMessage(); // 'ok'
 ```
 
-the only point of `produce` is to have a clear syntax distinction between `returning from a function` and `producing from a scope` because they would hypothetically be used in pretty tight unison
+### `enter`
 
-`produce` is ignored if it doesn't stdout into something, but it does "close" the scope
+`enter` before `scope` flags the scope to be both entered/ran **and** defined/reused:
 
-it most definitely does not return from the parent function scope
+```php
+<?php
 
-produce is a little limited here because of nesting, I'll circle back on this but this is my best idea for nesting so far:
+function sendMessage () : void {
+
+    // SEND scope is entered and ran
+    enter scope SEND {
+
+        // sends something...
+
+    }
+
+    $sendAgain = TRUE;
+    if ($sendAgain) {
+
+        SEND; // SEND scope is reusable
+
+    }
+}
+
+sendMessage();
+```
+
+### `thread`
+
+`thread` is an array of `scope` blocks to fork defined at the beginning of a function. I have some ideas on how this could work using IPC/Apache2 to avoid latency but this is the idea on the PHP side:
+
+```php
+class IndexController extends Controller {
+
+    #[Route('/', name: 'index')]
+    public function index (
+
+        Incrementer $incrementer
+
+    ) : Response {
+
+        thread {
+
+            // scope doesn't need to block
+            // flagged to fork if ever ran in `index`
+            // whether by `enter` or invoking it
+            INCREMENT
+
+        }
+
+        // `enter` token
+        // enters like an if (TRUE)
+        enter scope INCREMENT : bool {
+
+            // injected dependency available
+            // even if being imported elsewhere
+            // good luck, autoloader man
+            $incrementer->increment();
+
+            // produces produce type "bool"
+            // ignored if not captured
+            produce TRUE;
+        }
+
+        // no `enter` token
+        // defines but does not enter, like an if (FALSE)
+        scope GET_NUMBERS : array {
+
+            produce [4, 5];
+
+        }
+
+        // GET_NUMBERS is defined, though; it can produce
+        return $this->render('index', [
+            'numbers' => GET_NUMBERS,
+        ]);
+    }
+
+    #[Route('/coin', name: 'coin')]
+    public function coin (
+
+        User $user
+
+    ) : Response {
+
+        // gets cached for two hours
+        enter scope COIN_FLIP => 7200 : bool {
+
+             produce (bool) rand(0, 1);
+
+        }
+
+        return $this->render('coin');
+    }
+}
+```
+
+It's meta to have another granularity but.
+
+I will admit this is similar to utilization of threading classes if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
+
+```php
+<?php
+
+namespace App\Controller;
+
+// singular qualifier (index) format
+scope App\Controller\IndexController\index ::: {
+
+    INCREMENT
+    GET_NUMBERS
+
+};
+
+// set a custom TTL using a var
+$ttl = 11000;
+scope App\Controller\IndexController\coin ::: {
+
+    COIN_FLIP => $ttl
+
+}
+
+// multiple qualifier (index, coin) format
+scope App\Controller\IndexController {
+
+    index ::: {
+
+        INCREMENT
+        GET_NUMBERS
+
+    }
+
+    coin ::: {
+        
+        COIN_FLIP => $ttl
+
+    }
+
+};
+
+// maybe be able to pull in qualifiers
+scope AppController\IndexController {
+
+    index
+    coin
+
+}
+
+// and use them later like this
+scope coin ::: COIN_FLIP => $ttl;
+
+// or expanded out
+scope coin ::: {
+
+    COIN_FLIP => $ttl
+
+}
+
+class AnalyticsController extends AbstractController {
+
+    #[Route('/analytics', name: 'analytics')]
+    public function analytics (
+
+        Request $request
+
+    ) : Response {
+
+        // in IndexController
+        // INCREMENT didn't need to block
+
+        // in AnalyticsController
+        // GET_NUMBERS needs to block
+
+        // no thread {} block is flagging it to fork
+        // so the scope runs synchronously
+        INCREMENT;
+
+        // now that the INCREMENT scope ran
+        // you can get the numbers and Twig inject
+        return $this->render('analytics', [
+            'views' => GET_NUMBERS,
+        ]);
+    }
+}
+```
+
+### brainium radicale
+here's some more radical concepts that I think are actually pretty clean
+
+```php
+<?php
+
+namespace App\Controller;
+
+class PhpInfoController extends AbstractController {
+
+    #[Route('/phpinfo', name: 'phpinfo')]
+    public function phpinfo (
+
+        Request $request,
+        User $user
+
+    ) : Response {
+
+        // additional optional curly brace block
+        // that's just the thread block but unnamed
+        // that accomplishes the same thing smoothly
+
+        DISPATCH_MESSAGE
+    
+    } {
+
+        // DISPATCH_MESSAGE is flagged to enter, thread
+        // so when it gets here it forks
+        enter scope DISPATCH_MESSAGE : int {
+
+            $this->logger('message', 'sending message');
+            produce 200;
+
+        }
+
+        // programmatically generate a TTL based on need
+        $ttl = 3600;
+
+        // every time this runs uncached, it "tries"
+        try scope HOURLY_NUMBER => $ttl : int {
+
+            // random number each hour
+            produce rand(1, 10);
+
+        } catch (\Exception $e) {
+
+            // handle error...
+
+        }
+
+        return $this->render('phpinfo', [
+
+            'info' => phpinfo()
+
+        ]);
+    }
+}
+```
+
+### nesting
 
 ```php
 <?php
@@ -94,257 +328,6 @@ scope MAIN : string | bool {
 
         produce 'did not pass check';
 
-    }
-}
-```
-
-### `scope` sections out code
-
-the point of scopes is to section out a block you want either threaded, TTL'd, or imported elsewhere
-
-`scope` has optional "produce types" that follow the same syntax as return types that could be helpful, as well as a default TTL syntax that's double-arrowed
-
-### `dead` skips the scope for now
-
-because it will have been dead before it ever even started, to be alive - the block of code
-
-```php
-class IndexController extends Controller {
-
-    #[Route('/', name: 'index')]
-    public function index (
-
-        User $user
-
-    ) : Response {
-
-        thread {
-
-            // neither of these need to block UX
-            TRACK_GENERIC_VIEW
-            TRACK_INDEX_VIEW
-
-        }
-
-        // enters here like it was an if (TRUE)
-        scope TRACK_GENERIC_VIEW : bool {
-
-            // $user injected dependency available
-            // even if being imported elsewhere
-            $user->trackGenericView();
-            $user->save();
-
-            // produces bool, ignored if not captured
-            produce TRUE;
-
-            // continues...
-        } //// continues past curly brace...
-
-        // enters here like it was an if (TRUE)
-        scope TRACK_INDEX_VIEW : void {
-
-            // ...
-            $user->trackIndexView();
-            $user->save();
-
-            // does not produce, hence void
-            // ...
-
-            // continues...
-        } //// continues past curly brace...
-
-        // dead but importable/executable scope elsewhere
-        // does not enter here, like it was an if (FALSE)
-        dead scope GET_GENERIC_VIEWS : array {
-
-            produce [4, 5];
-
-            // continues...
-        } //// continues past curly brace...
-
-        // GET_GENERIC_VIEWS can still produce no worries
-        return $this->render('views', [
-            'views' => GET_GENERIC_VIEWS,
-        ]);
-    }
-
-    #[Route('/other', name: 'other')]
-    public function other (
-
-        User $user
-
-    ) : Response {
-
-        dead scope COIN_FLIP => 7200 : bool {
-
-             // flips coin every two hours
-             produce (bool) rand(0, 1);
-        }
-
-        return $this->render('other');
-    }
-}
-```
-
-It's meta to have another granularity but these tokens enable smart, dynamic, low-level threading and code reusability, TTL caching, all kinds of weird stuff; they do have a point
-
-I will admit some of this is close to just being a type of function or utilization of a threading class if you admit that even Mr. Clean himself... Mr. Clean himself would drop his stupid, disgusting sponge in shock at the sight of something so fresh; I'd bet on it, all in, every time on that
-
-Full snippet.
-
-```php
-<?php
-
-namespace App\Controller;
-
-// singular format idea, my vote
-scope App\Controller\IndexController\index ::: {
-
-    TRACK_GENERIC_VIEW
-    GET_GENERIC_VIEWS
-
-};
-
-// one for each method, pretty clean var but functional
-// set a custom TTL for coin flipping
-$ttl = 11000;
-scope App\Controller\IndexController\other ::: {
-
-    COIN_FLIP => $ttl
-
-}
-
-// multiple format idea, my vote also, stronger
-scope App\Controller\IndexController ::: {
-
-    index ::: {
-
-        TRACK_GENERIC_VIEW
-        GET_GENERIC_VIEWS
-
-    }
-
-    other ::: {
-        
-        COIN_FLIP => $ttl
-
-    }
-
-};
-
-// so maybe be able to pull in multiple qualifiers
-scope AppController\IndexController ::: {
-
-    index
-    other
-
-}
-
-// and use them later like this
-scope other ::: COIN_FLIP => $ttl;
-
-// or expanded, by qualifier, like this
-scope other ::: {
-
-    COIN_FLIP => $ttl
-
-}
-
-class AnalyticsController extends AbstractController {
-
-    #[Route('/analytics', name: 'analytics')]
-    public function analytics (
-
-        Request $request
-
-    ) : Response {
-
-        // an example of synchronous and asynchronous
-        // in the IndexController,
-        // TRACK_GENERIC_VIEW didn't need to block
-        // in the AnalyticsController,
-        // TRACK_GENERIC_VIEW needs to block
-        // two different usages of code in two places
-        // drop-in use a scope synchronously
-        // because no thread {} block is defined
-        TRACK_GENERIC_VIEW;
-
-        // now that the TRACK_GENERIC_VIEW scope ran
-        // you can get the generic views
-        // inject the full views query res into Twig
-        return $this->render('analytics', [
-            'views' => GET_GENERIC_VIEWS,
-        ]);
-    }
-}
-```
-
-### brainium radicale
-here's some more radical concepts that I think are actually pretty clean, honestly
-
-```php
-<?php
-
-namespace App\Controller;
-
-class PhpInfoController extends AbstractController {
-
-    #[Route('/phpinfo', name: 'request')]
-    public function phpinfo (
-
-        Request $request,
-        User $user
-
-    ) : Response {
-
-        // additional optional curly brace block
-        // that's just the thread array
-        // that accomplishes the same thing smoothly
-
-        TRACK_GENERIC_VIEW
-        DISPATCH_MESSAGE
-    
-    } {
-
-        // TRACK_GENERIC_VIEW is marked to thread
-        // so when it gets here it forks
-        scope TRACK_GENERIC_VIEW : bool {
-
-            $user->trackGenericView();
-            $user->save();
-
-            produce TRUE;
-
-        } //// continues post-fork past curly brace...
-        ////// forgets about it
-
-        // DISPATCH_MESSAGE is marked to thread
-        // so when it gets here it forks
-        scope DISPATCH_MESSAGE : int {
-
-            $this->logger('message', 'sending message');
-            produce 200;
-
-        } //// continues post-fork past curly brace...
-        ////// forgets about it
-
-        // every time this runs, it tries
-        try dead scope HOURLY_NUMBER => $ttl : int {
-
-            // random number each hour
-            produce rand(1, 10);
-
-        } catch (\Exception $e) {
-
-        } finally {
-
-        }
-
-        return $this->render('phpinfo', [
-
-            'info' => phpinfo()
-
-        ]);
     }
 }
 ```
