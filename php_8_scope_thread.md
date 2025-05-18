@@ -8,7 +8,7 @@ read about [adapt](https://github.com/dharkflower/syntax/blob/main/php_5_adapt.m
 
 ### but constants
 
-maybe scopes could act like constants, unable to be redefined once defined, so that the namespacing doesn't clash
+fair, I don't know what to say except for if this syntax could work I would straight up dig that
 
 ### `scope` and `produce`
 
