@@ -43,9 +43,11 @@ $status = sendMessage();
 echo $status; // 'ok'
 ```
 
-### `enter`
+### `enter`, or `do` if you're a disgusting slob maybe
 
 `enter` before `scope` flags the scope to be executed inline as it gets defined
+
+if `enter` is too out there `do` would make sense
 
 ```php
 <?php
@@ -64,6 +66,23 @@ function sendMessage () : void {
 
         // SEND scope is executed again
         SEND;
+
+        // SEND scope is executed again
+        SEND();
+
+        // SEND scope is executed with better formatting
+        // again
+        SEND () ;
+
+        // SEND scope is executed twice, inline
+        // with better, more exuberant formatting
+        SEND () ; SEND () ;
+
+        // slim
+        SEND ; SEND ;
+
+        // the space between
+        SEND SEND ;
 
     }
 }
