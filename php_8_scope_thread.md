@@ -70,6 +70,9 @@ function sendMessage () : void {
         // SEND scope is executed again
         SEND();
 
+        // the wicked lies you told
+        SEND ;
+
         // SEND scope is executed with better formatting
         // again
         SEND () ;
@@ -83,6 +86,9 @@ function sendMessage () : void {
 
         // the space between
         SEND SEND ;
+
+        // ... compiled
+        
 
     }
 }
