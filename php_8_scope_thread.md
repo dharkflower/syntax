@@ -67,7 +67,7 @@ function sendMessage () : void {
         // SEND scope is executed again
         SEND;
 
-        // SEND scope is executed again
+        // SEND scope is executed again but is crammed
         SEND();
 
         // the wicked lies you told
@@ -88,8 +88,10 @@ function sendMessage () : void {
         SEND SEND ;
 
         // ... compiled
-        
+        SEND
 
+        // compiled.
+        SEND SEND SEND
     }
 }
 
