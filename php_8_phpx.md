@@ -149,10 +149,8 @@ PROCESS_ITEM (Item $item) : void ::: {
     produce store($transformed);  
 }  
 
-{  
-    foreach thread ($items as $item) {  
-        PROCESS_ITEM($item);  
-    }  
+foreach thread ($items as $item) {  
+    PROCESS_ITEM($item);  
 }  
 ```  
 
